@@ -15,6 +15,14 @@
   ],
   "license": "MIT",
   "author": "Onyekachi Mbaike",
+  "homepage": "https://github.com/onyekvchi/layoutkit#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onyekvchi/layoutkit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/onyekvchi/layoutkit/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
