@@ -27,7 +27,7 @@ export default function App() {
 
 It renders nothing on the server and nothing in production builds unless you pass `productionEnabled`.
 
-A small toolbar in the bottom-left corner switches measuring, rulers and grids on and off and opens the grid settings; the shortcuts below work too. Drag the toolbar anywhere to get it out of the way; double-click its grip to send it back to the corner. Its position and which tools are on are remembered between reloads.
+A round button in the bottom-left corner opens the toolbar, which switches measuring, rulers and grids on and off and opens the grid settings; the shortcuts below work whether it's open or not. A blue dot on the closed button means rulers or grids are on. Drag it anywhere, open or closed; it expands towards the middle of the screen. Its position, whether it's open, and which tools are on are remembered between reloads.
 
 It sits alongside [DialKit](https://github.com/joshpuckett/dialkit) and [Agentation](https://agentation.com): their panels and toolbars are ignored when measuring.
 

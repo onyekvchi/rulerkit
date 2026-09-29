@@ -41,10 +41,19 @@ export const css = `
 .rk-dock { user-select: none; -webkit-user-select: none; }
 .rk-dock[data-moved] { transition: none; }
 .rk-dock[data-dragging], .rk-dock[data-dragging] * { cursor: grabbing !important; }
-.rk-grip { display: grid; place-items: center; width: 12px; height: 28px; margin-right: -2px; color: var(--rk-muted); opacity: 0.6; cursor: grab; transition: opacity 120ms; }
-.rk-grip svg { width: 6px; height: 16px; }
-.rk-toolbar:hover .rk-grip { opacity: 1; }
-.rk-toolbar { display: flex; align-items: center; gap: 2px; padding: 4px; cursor: grab; touch-action: none; border-radius: 12px; background: var(--rk-bg); border: 1px solid var(--rk-border); box-shadow: 0 8px 24px rgb(0 0 0 / 0.3); backdrop-filter: blur(12px); }
+.rk-toolbar { display: flex; align-items: center; padding: 4px; border-radius: 999px; cursor: grab; touch-action: none; background: var(--rk-bg); border: 1px solid var(--rk-border); box-shadow: 0 8px 24px rgb(0 0 0 / 0.3), 0 1px 2px rgb(0 0 0 / 0.2); backdrop-filter: blur(12px); }
+.rk-toolbar[data-side='right'] { flex-direction: row-reverse; }
+.rk-fab { position: relative; display: grid; place-items: center; flex-shrink: 0; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--rk-text); cursor: inherit; transition: background-color 120ms; }
+.rk-fab:hover { background: var(--rk-field); }
+.rk-fab svg { width: 18px; height: 18px; }
+.rk-fab-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--rk-accent); box-shadow: 0 0 0 2px rgb(22 22 24); }
+.rk-tools { display: grid; grid-template-columns: 0fr; opacity: 0; transition: grid-template-columns 260ms cubic-bezier(0.23, 1, 0.32, 1), opacity 160ms ease-out; }
+.rk-toolbar[data-expanded] .rk-tools { grid-template-columns: 1fr; opacity: 1; }
+.rk-tools-inner { display: flex; align-items: center; gap: 2px; min-width: 0; overflow: hidden; }
+.rk-divider { flex-shrink: 0; width: 1px; height: 18px; margin: 0 6px; background: var(--rk-border); order: -1; }
+.rk-toolbar[data-side='right'] .rk-divider { order: 99; }
+.rk-toolbar .rk-button { width: 32px; height: 32px; border-radius: 999px; flex-shrink: 0; }
+@media (prefers-reduced-motion: reduce) { .rk-tools, .rk-dock { transition: none; } }
 .rk-button { display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--rk-muted); cursor: pointer; }
 .rk-button:hover { color: var(--rk-text); background: var(--rk-field); }
 .rk-button[aria-pressed='true'] { color: var(--rk-text); background: rgb(13 153 255 / 0.22); }

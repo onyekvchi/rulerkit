@@ -38,14 +38,16 @@ const icons = {
       <path d="M6.6 6.6a2 2 0 002.8 2.8M2 2l12 12" />
     </svg>
   ),
-  grip: (
-    <svg viewBox="0 0 6 16" fill="currentColor">
-      <circle cx="1.5" cy="4.5" r="1" />
-      <circle cx="4.5" cy="4.5" r="1" />
-      <circle cx="1.5" cy="8" r="1" />
-      <circle cx="4.5" cy="8" r="1" />
-      <circle cx="1.5" cy="11.5" r="1" />
-      <circle cx="4.5" cy="11.5" r="1" />
+  logo: (
+    <svg viewBox="0 0 16 16" fill="none" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M2.5 2.5h11v3h-8v8h-3z" stroke="currentColor" />
+      <path d="M5 2.5v1.3M7.5 2.5v1.3M10 2.5v1.3M2.5 8h1.3M2.5 10.5h1.3" stroke="currentColor" />
+      <path d="M8.5 11.5h5M8.5 10v3M13.5 10v3" stroke="#f24822" />
+    </svg>
+  ),
+  close: (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round">
+      <path d="M4 4l8 8M12 4l-8 8" />
     </svg>
   ),
   measure: (
@@ -411,7 +413,7 @@ function useDraggable(rulers: boolean) {
   const [saved, setSaved] = usePersistentState<Point | null>('position', null)
   const [live, setLive] = useState<Point | null>(null)
   const ref = useRef<HTMLDivElement>(null)
-  const size = useRef({ width: 150, height: 38 })
+  const size = useRef({ width: 44, height: 44 })
   // Set when a press turned into a drag, so the click that ends it is ignored
   const dragged = useRef(false)
   useLayoutChange()
@@ -459,7 +461,6 @@ function useDraggable(rulers: boolean) {
     // Re-clamped every render so a resized window or the rulers appearing can't strand it
     position: current && clamp(current, size.current, rulers),
     dragging: live !== null,
-    reset: () => setSaved(null),
     onPointerDown,
     onClickCapture,
   }
@@ -476,17 +477,20 @@ export function Toolbar({
   ignore,
 }: ToolbarProps) {
   const [panelOpen, setPanelOpen] = useState(false)
+  // Collapsed to a round button by default, like DialKit and Agentation
+  const [expanded, setExpanded] = usePersistentState('expanded', false)
   const drag = useDraggable(rulers)
   const { position } = drag
 
   // Anchor the dock at the toolbar's corner nearest the viewport edge, so the
-  // grid panel opens towards the middle of the screen and stays on it
+  // toolbar expands and the grid panel opens towards the middle of the screen
   const dockStyle: CSSProperties = {}
   let panelBelow = false
+  let alignRight = false
   if (position) {
-    const { width, height } = drag.ref.current?.getBoundingClientRect() ?? { width: 150, height: 38 }
+    const { width, height } = drag.ref.current?.getBoundingClientRect() ?? { width: 44, height: 44 }
     panelBelow = position.y + height / 2 < window.innerHeight / 2
-    const alignRight = position.x + width / 2 > window.innerWidth / 2
+    alignRight = position.x + width / 2 > window.innerWidth / 2
     dockStyle.left = alignRight ? 'auto' : position.x
     dockStyle.right = alignRight ? window.innerWidth - position.x - width : 'auto'
     dockStyle.top = panelBelow ? position.y : 'auto'
@@ -498,6 +502,11 @@ export function Toolbar({
     ;(dockStyle as Record<string, string | number>)['--rk-panel-max'] = `${Math.max(space - 8 - EDGE, 160)}px`
   }
 
+  const toggleExpanded = () => {
+    if (expanded) setPanelOpen(false)
+    setExpanded(!expanded)
+  }
+
   return (
     <div
       className="rk-dock"
@@ -507,7 +516,7 @@ export function Toolbar({
       data-dragging={drag.dragging ? '' : undefined}
       style={dockStyle}
     >
-      {panelOpen && (
+      {expanded && panelOpen && (
         <GridPanel grids={gridConfig} onChange={onGridConfigChange} onReset={onGridConfigReset} ignore={ignore} />
       )}
       <div
@@ -515,29 +524,40 @@ export function Toolbar({
         className="rk-toolbar"
         role="toolbar"
         aria-label="rulerkit"
+        data-expanded={expanded ? '' : undefined}
+        data-side={alignRight ? 'right' : 'left'}
         onPointerDown={drag.onPointerDown}
         onClickCapture={drag.onClickCapture}
       >
-        <span
-          className="rk-grip"
-          title="Drag to move · double-click to reset"
-          aria-hidden="true"
-          onDoubleClick={drag.reset}
+        <button
+          type="button"
+          className="rk-fab"
+          aria-expanded={expanded}
+          aria-label={expanded ? 'Close rulerkit' : 'Open rulerkit'}
+          title={expanded ? 'Close' : 'rulerkit · drag to move'}
+          onClick={toggleExpanded}
         >
-          {icons.grip}
-        </span>
-        <ToggleButton label="Measure (hold Option)" pressed={measure} onClick={() => onToggle('measure')}>
-          {icons.measure}
-        </ToggleButton>
-        <ToggleButton label="Rulers (Shift R)" pressed={rulers} onClick={() => onToggle('rulers')}>
-          {icons.rulers}
-        </ToggleButton>
-        <ToggleButton label="Layout grids (Shift G)" pressed={grids} onClick={() => onToggle('grids')}>
-          {icons.grids}
-        </ToggleButton>
-        <ToggleButton label="Grid settings" pressed={panelOpen} onClick={() => setPanelOpen((open) => !open)}>
-          {icons.settings}
-        </ToggleButton>
+          {expanded ? icons.close : icons.logo}
+          {!expanded && (rulers || grids) && <span className="rk-fab-dot" aria-hidden="true" />}
+        </button>
+        {/* Width animates from 0 via grid-template-columns; inert while collapsed */}
+        <div className="rk-tools" inert={!expanded}>
+          <div className="rk-tools-inner">
+            <span className="rk-divider" aria-hidden="true" />
+            <ToggleButton label="Measure (hold Option)" pressed={measure} onClick={() => onToggle('measure')}>
+              {icons.measure}
+            </ToggleButton>
+            <ToggleButton label="Rulers (Shift R)" pressed={rulers} onClick={() => onToggle('rulers')}>
+              {icons.rulers}
+            </ToggleButton>
+            <ToggleButton label="Layout grids (Shift G)" pressed={grids} onClick={() => onToggle('grids')}>
+              {icons.grids}
+            </ToggleButton>
+            <ToggleButton label="Grid settings" pressed={panelOpen} onClick={() => setPanelOpen((open) => !open)}>
+              {icons.settings}
+            </ToggleButton>
+          </div>
+        </div>
       </div>
     </div>
   )
