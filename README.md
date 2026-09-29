@@ -81,7 +81,7 @@ Guides are saved per page (by pathname) and stay fixed to the viewport, so they'
 
 Every grid also takes `color` and `target`, a CSS selector of an element to lay the grid over instead of the viewport (e.g. `'main'`).
 
-The **grid settings** button in the toolbar opens a panel to edit grids live. Edits are saved in the browser and override the prop until you press **Reset**. **Copy props** copies the current grids as a `grids={...}` prop to paste back into your code.
+The **grid settings** button in the toolbar opens a panel to edit grids live, including each grid's colour and opacity. Edits are saved in the browser and override the prop until you press **Reset**. **Copy props** copies the current grids as a `grids={...}` prop to paste back into your code.
 
 ## Props
 

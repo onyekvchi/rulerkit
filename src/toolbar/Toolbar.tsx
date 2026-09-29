@@ -1,5 +1,11 @@
 import { type ReactNode, useState } from 'react'
-import type { GridAlignment, GridConfig, TrackGrid } from '../grids/Grids'
+import {
+  DEFAULT_BASELINE_COLOR,
+  DEFAULT_TRACK_COLOR,
+  type GridAlignment,
+  type GridConfig,
+  type TrackGrid,
+} from '../grids/Grids'
 
 const icons = {
   measure: (
@@ -52,11 +58,13 @@ function NumberField({
   value,
   onChange,
   min = 0,
+  max = Infinity,
 }: {
   label: string
   value: number | undefined
   onChange: (value: number) => void
   min?: number
+  max?: number
 }) {
   return (
     <label className="lk-field">
@@ -64,10 +72,59 @@ function NumberField({
       <input
         type="number"
         min={min}
+        max={Number.isFinite(max) ? max : undefined}
         value={value ?? 0}
-        onChange={(event) => onChange(Math.max(min, Number(event.target.value) || 0))}
+        onChange={(event) => onChange(Math.min(max, Math.max(min, Number(event.target.value) || 0)))}
       />
     </label>
+  )
+}
+
+/**
+ * Splits any CSS colour into a hex colour (for <input type="color">, which has
+ * no alpha) and an opacity, using the canvas to normalise the format.
+ */
+function parseColor(color: string) {
+  const context = document.createElement('canvas').getContext('2d')
+  if (!context) return { hex: '#ff0000', alpha: 1 }
+  context.fillStyle = color
+  // fillStyle reads back as '#rrggbb' when opaque, 'rgba(r, g, b, a)' otherwise
+  const value = String(context.fillStyle)
+  if (value.startsWith('#')) return { hex: value, alpha: 1 }
+  const [r, g, b, a = 1] = value.match(/[\d.]+/g)?.map(Number) ?? [255, 0, 0, 1]
+  const hex = `#${[r, g, b].map((channel) => Math.round(channel).toString(16).padStart(2, '0')).join('')}`
+  return { hex, alpha: a }
+}
+
+function toColor(hex: string, alpha: number) {
+  const [r, g, b] = [1, 3, 5].map((index) => parseInt(hex.slice(index, index + 2), 16))
+  return `rgb(${r} ${g} ${b} / ${Math.round(alpha * 100) / 100})`
+}
+
+function ColorField({ color, onChange }: { color: string; onChange: (color: string) => void }) {
+  const { hex, alpha } = parseColor(color)
+
+  return (
+    <div className="lk-color-row">
+      <label className="lk-field">
+        Color
+        <span className="lk-color">
+          <input
+            type="color"
+            aria-label="Grid color"
+            value={hex}
+            onChange={(event) => onChange(toColor(event.target.value, alpha))}
+          />
+          <span>{hex.toUpperCase()}</span>
+        </span>
+      </label>
+      <NumberField
+        label="Opacity %"
+        value={Math.round(alpha * 100)}
+        max={100}
+        onChange={(percent) => onChange(toColor(hex, percent / 100))}
+      />
+    </div>
   )
 }
 
@@ -136,6 +193,11 @@ function GridCard({
           )}
         </>
       )}
+
+      <ColorField
+        color={grid.color ?? (grid.type === 'baseline' ? DEFAULT_BASELINE_COLOR : DEFAULT_TRACK_COLOR)}
+        onChange={(color) => set({ color })}
+      />
 
       <label className="lk-field" style={{ gridColumn: '1 / -1' }}>
         Target (CSS selector, empty for viewport)

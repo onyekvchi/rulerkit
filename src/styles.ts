@@ -52,6 +52,12 @@ export const css = `
 .lk-field { display: flex; flex-direction: column; gap: 3px; color: var(--lk-muted); }
 .lk-field input, .lk-field select, .lk-grid-card-header select { width: 100%; height: 24px; padding: 0 6px; border: 1px solid transparent; border-radius: 6px; background: var(--lk-field); color: var(--lk-text); font: inherit; }
 .lk-field input:focus, .lk-field select:focus { border-color: var(--lk-accent); outline: none; }
+.lk-color-row { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+.lk-color { display: flex; align-items: center; gap: 6px; height: 24px; padding: 0 6px 0 3px; border-radius: 6px; background: var(--lk-field); color: var(--lk-text); }
+.lk-color input[type='color'] { width: 18px; height: 18px; padding: 0; border: 0; border-radius: 4px; background: none; cursor: pointer; }
+.lk-color input[type='color']::-webkit-color-swatch-wrapper { padding: 0; }
+.lk-color input[type='color']::-webkit-color-swatch { border: 0; border-radius: 4px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.15); }
+.lk-color input[type='color']::-moz-color-swatch { border: 0; border-radius: 4px; }
 .lk-text-button { height: 24px; padding: 0 8px; border: 0; border-radius: 6px; background: var(--lk-field); color: var(--lk-text); font: inherit; cursor: pointer; }
 .lk-text-button:hover { background: rgb(255 255 255 / 0.1); }
 .lk-text-button-quiet { background: transparent; color: var(--lk-muted); }
