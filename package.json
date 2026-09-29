@@ -1,6 +1,6 @@
 {
   "name": "rulerkit",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Figma-style layout inspection for your running app: measure distances, rulers with guides, and layout grids.",
   "keywords": [
     "react",
