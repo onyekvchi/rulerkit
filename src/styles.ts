@@ -37,15 +37,21 @@ export const css = `
 .rk-guide:hover .rk-guide-label, .rk-guide[data-dragging] .rk-guide-label { display: block; }
 
 .rk-dock { position: fixed; z-index: 2147483647; left: 16px; bottom: 16px; transition: left 150ms ease-out; display: flex; flex-direction: column; align-items: flex-start; gap: 8px; }
-.rk-dock[data-rulers] { left: ${RULER_SIZE + 12}px; }
-.rk-toolbar { display: flex; gap: 2px; padding: 4px; border-radius: 12px; background: var(--rk-bg); border: 1px solid var(--rk-border); box-shadow: 0 8px 24px rgb(0 0 0 / 0.3); backdrop-filter: blur(12px); }
+.rk-dock[data-rulers]:not([data-moved]) { left: ${RULER_SIZE + 12}px; }
+.rk-dock { user-select: none; -webkit-user-select: none; }
+.rk-dock[data-moved] { transition: none; }
+.rk-dock[data-dragging], .rk-dock[data-dragging] * { cursor: grabbing !important; }
+.rk-grip { display: grid; place-items: center; width: 12px; height: 28px; margin-right: -2px; color: var(--rk-muted); opacity: 0.6; cursor: grab; transition: opacity 120ms; }
+.rk-grip svg { width: 6px; height: 16px; }
+.rk-toolbar:hover .rk-grip { opacity: 1; }
+.rk-toolbar { display: flex; align-items: center; gap: 2px; padding: 4px; cursor: grab; touch-action: none; border-radius: 12px; background: var(--rk-bg); border: 1px solid var(--rk-border); box-shadow: 0 8px 24px rgb(0 0 0 / 0.3); backdrop-filter: blur(12px); }
 .rk-button { display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--rk-muted); cursor: pointer; }
 .rk-button:hover { color: var(--rk-text); background: var(--rk-field); }
 .rk-button[aria-pressed='true'] { color: var(--rk-text); background: rgb(13 153 255 / 0.22); }
 .rk-button:focus-visible, .rk-panel :focus-visible { outline: 2px solid var(--rk-accent); outline-offset: 1px; }
 .rk-button svg { width: 16px; height: 16px; }
 
-.rk-panel { width: 288px; max-height: min(480px, calc(100vh - 96px)); overflow: auto; padding: 12px; border-radius: 12px; background: var(--rk-bg); border: 1px solid var(--rk-border); box-shadow: 0 8px 24px rgb(0 0 0 / 0.3); backdrop-filter: blur(12px); }
+.rk-panel { width: 288px; max-height: min(480px, var(--rk-panel-max, calc(100vh - 96px))); overflow: auto; padding: 12px; border-radius: 12px; background: var(--rk-bg); border: 1px solid var(--rk-border); box-shadow: 0 8px 24px rgb(0 0 0 / 0.3); backdrop-filter: blur(12px); }
 .rk-panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 12px; }
 .rk-grid-card { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 8px; margin-bottom: 8px; border-radius: 8px; border: 1px solid var(--rk-border); }
 .rk-grid-card-header { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 6px; }

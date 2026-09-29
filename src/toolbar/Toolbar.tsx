@@ -1,4 +1,13 @@
-import { type ReactNode, useState } from 'react'
+import {
+  type CSSProperties,
+  type MouseEvent as ReactMouseEvent,
+  type PointerEvent as ReactPointerEvent,
+  type ReactNode,
+  useRef,
+  useState,
+} from 'react'
+import { useLayoutChange, usePersistentState } from '../lib/state'
+import { RULER_SIZE } from '../styles'
 import {
   DEFAULT_BASELINE_COLOR,
   DEFAULT_TRACK_COLOR,
@@ -8,6 +17,16 @@ import {
 } from '../grids/Grids'
 
 const icons = {
+  grip: (
+    <svg viewBox="0 0 6 16" fill="currentColor">
+      <circle cx="1.5" cy="4.5" r="1" />
+      <circle cx="4.5" cy="4.5" r="1" />
+      <circle cx="1.5" cy="8" r="1" />
+      <circle cx="4.5" cy="8" r="1" />
+      <circle cx="1.5" cy="11.5" r="1" />
+      <circle cx="4.5" cy="11.5" r="1" />
+    </svg>
+  ),
   measure: (
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round">
       <path d="M2.5 8h11M2.5 5.5v5M13.5 5.5v5M5 8l-1.5-1.5M5 8L3.5 9.5M11 8l1.5-1.5M11 8l1.5 1.5" />
@@ -282,6 +301,91 @@ export interface ToolbarProps {
   onGridConfigReset: () => void
 }
 
+interface Point {
+  x: number
+  y: number
+}
+
+// Past this distance (px) a press on the toolbar becomes a drag, not a click
+const DRAG_THRESHOLD = 4
+// Space kept between the toolbar and the viewport edges (or the rulers)
+const EDGE = 8
+
+/**
+ * Keeps the toolbar's top-left corner inside the viewport, clear of the
+ * rulers when they're showing.
+ */
+function clamp(point: Point, size: { width: number; height: number }, rulers: boolean): Point {
+  const min = rulers ? RULER_SIZE + EDGE : EDGE
+  return {
+    x: Math.round(Math.min(Math.max(point.x, min), window.innerWidth - size.width - EDGE)),
+    y: Math.round(Math.min(Math.max(point.y, min), window.innerHeight - size.height - EDGE)),
+  }
+}
+
+/**
+ * Lets the toolbar be dragged anywhere, from any part of it. Returns the
+ * position to render (null keeps the default corner), whether a drag is in
+ * progress, and handlers for the toolbar element.
+ */
+function useDraggable(rulers: boolean) {
+  const [saved, setSaved] = usePersistentState<Point | null>('position', null)
+  const [live, setLive] = useState<Point | null>(null)
+  const ref = useRef<HTMLDivElement>(null)
+  const size = useRef({ width: 150, height: 38 })
+  // Set when a press turned into a drag, so the click that ends it is ignored
+  const dragged = useRef(false)
+  useLayoutChange()
+
+  const onPointerDown = (event: ReactPointerEvent) => {
+    const toolbar = ref.current
+    if (event.button !== 0 || !toolbar) return
+    const rect = toolbar.getBoundingClientRect()
+    size.current = { width: rect.width, height: rect.height }
+    const start = { x: event.clientX, y: event.clientY }
+    let last: Point | null = null
+    dragged.current = false
+
+    const onMove = (move: PointerEvent) => {
+      const dx = move.clientX - start.x
+      const dy = move.clientY - start.y
+      if (!dragged.current && Math.hypot(dx, dy) < DRAG_THRESHOLD) return
+      dragged.current = true
+      last = clamp({ x: rect.left + dx, y: rect.top + dy }, size.current, rulers)
+      setLive(last)
+    }
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      window.removeEventListener('pointercancel', onUp)
+      // Persist once at the end rather than on every move
+      if (last) setSaved(last)
+      setLive(null)
+    }
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+    window.addEventListener('pointercancel', onUp)
+  }
+
+  const onClickCapture = (event: ReactMouseEvent) => {
+    if (!dragged.current) return
+    dragged.current = false
+    event.preventDefault()
+    event.stopPropagation()
+  }
+
+  const current = live ?? saved
+  return {
+    ref,
+    // Re-clamped every render so a resized window or the rulers appearing can't strand it
+    position: current && clamp(current, size.current, rulers),
+    dragging: live !== null,
+    reset: () => setSaved(null),
+    onPointerDown,
+    onClickCapture,
+  }
+}
+
 export function Toolbar({
   measure,
   rulers,
@@ -292,11 +396,54 @@ export function Toolbar({
   onGridConfigReset,
 }: ToolbarProps) {
   const [panelOpen, setPanelOpen] = useState(false)
+  const drag = useDraggable(rulers)
+  const { position } = drag
+
+  // Anchor the dock at the toolbar's corner nearest the viewport edge, so the
+  // grid panel opens towards the middle of the screen and stays on it
+  const dockStyle: CSSProperties = {}
+  let panelBelow = false
+  if (position) {
+    const { width, height } = drag.ref.current?.getBoundingClientRect() ?? { width: 150, height: 38 }
+    panelBelow = position.y + height / 2 < window.innerHeight / 2
+    const alignRight = position.x + width / 2 > window.innerWidth / 2
+    dockStyle.left = alignRight ? 'auto' : position.x
+    dockStyle.right = alignRight ? window.innerWidth - position.x - width : 'auto'
+    dockStyle.top = panelBelow ? position.y : 'auto'
+    dockStyle.bottom = panelBelow ? 'auto' : window.innerHeight - position.y - height
+    dockStyle.flexDirection = panelBelow ? 'column-reverse' : 'column'
+    dockStyle.alignItems = alignRight ? 'flex-end' : 'flex-start'
+    // The panel can only be as tall as the space on the side it opens towards
+    const space = panelBelow ? window.innerHeight - position.y - height : position.y
+    ;(dockStyle as Record<string, string | number>)['--rk-panel-max'] = `${Math.max(space - 8 - EDGE, 160)}px`
+  }
 
   return (
-    <div className="rk-dock" data-rulerkit="" data-rulers={rulers ? '' : undefined}>
+    <div
+      className="rk-dock"
+      data-rulerkit=""
+      data-rulers={rulers ? '' : undefined}
+      data-moved={position ? '' : undefined}
+      data-dragging={drag.dragging ? '' : undefined}
+      style={dockStyle}
+    >
       {panelOpen && <GridPanel grids={gridConfig} onChange={onGridConfigChange} onReset={onGridConfigReset} />}
-      <div className="rk-toolbar" role="toolbar" aria-label="rulerkit">
+      <div
+        ref={drag.ref}
+        className="rk-toolbar"
+        role="toolbar"
+        aria-label="rulerkit"
+        onPointerDown={drag.onPointerDown}
+        onClickCapture={drag.onClickCapture}
+      >
+        <span
+          className="rk-grip"
+          title="Drag to move · double-click to reset"
+          aria-hidden="true"
+          onDoubleClick={drag.reset}
+        >
+          {icons.grip}
+        </span>
         <ToggleButton label="Measure (hold Option)" pressed={measure} onClick={() => onToggle('measure')}>
           {icons.measure}
         </ToggleButton>
