@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
-const PREFIX = 'layoutkit:'
+const PREFIX = 'rulerkit:'
 
 function load<T>(key: string, fallback: T): T {
   try {
@@ -30,7 +30,7 @@ export function forget(key: string) {
 type SetState<T> = (next: T | ((previous: T) => T)) => void
 
 /**
- * useState that's saved to localStorage under `layoutkit:<key>`. Changing
+ * useState that's saved to localStorage under `rulerkit:<key>`. Changing
  * `key` (e.g. per page) loads that key's value.
  */
 export function usePersistentState<T>(key: string, fallback: T): [T, SetState<T>] {

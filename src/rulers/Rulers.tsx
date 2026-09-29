@@ -65,7 +65,7 @@ function Marks({ axis, rects, color }: { axis: Axis; rects: DOMRect[]; color: st
         : { top: start - RULER_SIZE, height: end - start, left: 0, right: 0 }
     const mark = (value: number, side: 'start' | 'end') => (
       <span
-        className="lk-ruler-mark"
+        className="rk-ruler-mark"
         style={{
           background: color,
           ...(axis === 'x'
@@ -84,7 +84,7 @@ function Marks({ axis, rects, color }: { axis: Axis; rects: DOMRect[]; color: st
 
     return (
       <span key={index}>
-        <span className="lk-ruler-band" style={{ ...band, background: `color-mix(in srgb, ${color} 20%, transparent)` }} />
+        <span className="rk-ruler-band" style={{ ...band, background: `color-mix(in srgb, ${color} 20%, transparent)` }} />
         {mark(start, 'start')}
         {mark(end, 'end')}
       </span>
@@ -141,27 +141,27 @@ export function Rulers({ focus, guides, onGuidesChange, color, guideColor }: Rul
       {shown.map((guide) => (
         <div
           key={guide.id}
-          className={`lk-guide lk-guide-${guide.axis}`}
+          className={`rk-guide rk-guide-${guide.axis}`}
           data-dragging={guide.id === dragging?.id ? '' : undefined}
           style={{
-            ['--lk-guide' as string]: guideColor,
+            ['--rk-guide' as string]: guideColor,
             ...(guide.axis === 'x' ? { left: guide.position } : { top: guide.position }),
           }}
           onPointerDown={(event) => startDrag(event, guide.axis, guide.id)}
         >
-          <span className="lk-guide-label">{guide.position}</span>
+          <span className="rk-guide-label">{guide.position}</span>
         </div>
       ))}
       {/* Top ruler makes horizontal guides (y), left ruler vertical ones (x) */}
-      <div className="lk-ruler lk-ruler-x" onPointerDown={(event) => startDrag(event, 'y')}>
+      <div className="rk-ruler rk-ruler-x" onPointerDown={(event) => startDrag(event, 'y')}>
         <RulerCanvas axis="x" length={window.innerWidth - RULER_SIZE} />
         <Marks axis="x" rects={rects} color={color} />
       </div>
-      <div className="lk-ruler lk-ruler-y" onPointerDown={(event) => startDrag(event, 'x')}>
+      <div className="rk-ruler rk-ruler-y" onPointerDown={(event) => startDrag(event, 'x')}>
         <RulerCanvas axis="y" length={window.innerHeight - RULER_SIZE} />
         <Marks axis="y" rects={rects} color={color} />
       </div>
-      <div className="lk-ruler-corner" />
+      <div className="rk-ruler-corner" />
     </>
   )
 }

@@ -20,7 +20,7 @@ const DEFAULT_IGNORE = [
 const NO_GRIDS: GridConfig[] = []
 const NO_GUIDES: Guide[] = []
 
-export interface LayoutKitProps {
+export interface RulerKitProps {
   /** Colour of outlines, measurement lines, labels and ruler marks. Defaults to Figma's redline orange. */
   color?: string
   /** Colour of ruler guides. Defaults to Figma's guide blue. */
@@ -53,7 +53,7 @@ function Kit({
   grids: gridsProp,
   ignore,
   toolbar,
-}: Required<Omit<LayoutKitProps, 'productionEnabled'>>) {
+}: Required<Omit<RulerKitProps, 'productionEnabled'>>) {
   const [tools, setTools] = usePersistentState<Tools>('tools', { measure: true, rulers: false, grids: false })
   const [gridConfig, setGridConfig] = usePersistentState<GridConfig[] | null>('grids', null)
   const pathname = usePathname()
@@ -85,7 +85,7 @@ function Kit({
   const activeGrids = gridConfig ?? gridsProp
 
   return (
-    <div data-layoutkit="">
+    <div data-rulerkit="">
       <style>{css}</style>
       {tools.grids && <Grids grids={activeGrids} />}
       {tools.rulers && (
@@ -128,14 +128,14 @@ function Kit({
  * guides (Shift + R) and layout grids (Shift + G). Mount it once, anywhere in
  * your tree.
  */
-export function LayoutKit({
+export function RulerKit({
   color = '#f24822',
   guideColor = '#0d99ff',
   grids = NO_GRIDS,
   ignore = '',
   toolbar = true,
   productionEnabled = false,
-}: LayoutKitProps) {
+}: RulerKitProps) {
   // Client only: renders nothing on the server or before hydration
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])

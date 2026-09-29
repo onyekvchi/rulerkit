@@ -1,25 +1,25 @@
-# layoutkit
+# rulerkit
 
 Figma-style layout inspection for your running app: measure distances between elements, pull guides out of rulers, and lay columns, rows and baseline grids over the page. Tune spacing against the real page instead of guessing.
 
 ## Install
 
 ```bash
-npm install -D layoutkit
+npm install -D rulerkit
 ```
 
 ## Usage
 
-Mount `<LayoutKit />` once, anywhere in your React tree:
+Mount `<RulerKit />` once, anywhere in your React tree:
 
 ```jsx
-import { LayoutKit } from 'layoutkit'
+import { RulerKit } from 'rulerkit'
 
 export default function App() {
   return (
     <>
       <YourApp />
-      <LayoutKit />
+      <RulerKit />
     </>
   )
 }
@@ -66,7 +66,7 @@ Guides are saved per page (by pathname) and stay fixed to the viewport, so they'
 **Shift + G** (or Figma's **Ctrl + G**) toggles layout grids. Define them with the `grids` prop; several can be stacked, like Figma's layout grids:
 
 ```jsx
-<LayoutKit
+<RulerKit
   grids={[
     { type: 'columns', count: 12, gutter: 24, margin: 64 },
     { type: 'baseline', size: 8 },
@@ -114,7 +114,7 @@ npm run build
 npm run typecheck
 ```
 
-To try it in another project before publishing, install it from the folder (`npm install -D ../layoutkit`). If the app then reports an invalid hook call, dedupe React in the app's bundler (in Vite: `resolve: { dedupe: ['react', 'react-dom'] }`).
+To try it in another project before publishing, install it from the folder (`npm install -D ../rulerkit`). If the app then reports an invalid hook call, dedupe React in the app's bundler (in Vite: `resolve: { dedupe: ['react', 'react-dom'] }`).
 
 ## License
 

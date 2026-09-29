@@ -47,7 +47,7 @@ function ToggleButton({
   children: ReactNode
 }) {
   return (
-    <button type="button" className="lk-button" aria-label={label} title={label} aria-pressed={pressed} onClick={onClick}>
+    <button type="button" className="rk-button" aria-label={label} title={label} aria-pressed={pressed} onClick={onClick}>
       {children}
     </button>
   )
@@ -67,7 +67,7 @@ function NumberField({
   max?: number
 }) {
   return (
-    <label className="lk-field">
+    <label className="rk-field">
       {label}
       <input
         type="number"
@@ -105,10 +105,10 @@ function ColorField({ color, onChange }: { color: string; onChange: (color: stri
   const { hex, alpha } = parseColor(color)
 
   return (
-    <div className="lk-color-row">
-      <label className="lk-field">
+    <div className="rk-color-row">
+      <label className="rk-field">
         Color
-        <span className="lk-color">
+        <span className="rk-color">
           <input
             type="color"
             aria-label="Grid color"
@@ -148,8 +148,8 @@ function GridCard({
     )
 
   return (
-    <div className="lk-grid-card">
-      <div className="lk-grid-card-header">
+    <div className="rk-grid-card">
+      <div className="rk-grid-card-header">
         <select
           aria-label="Grid type"
           value={grid.type}
@@ -159,7 +159,7 @@ function GridCard({
           <option value="rows">Rows</option>
           <option value="baseline">Baseline</option>
         </select>
-        <button type="button" className="lk-text-button lk-text-button-quiet" onClick={onRemove}>
+        <button type="button" className="rk-text-button rk-text-button-quiet" onClick={onRemove}>
           Remove
         </button>
       </div>
@@ -173,7 +173,7 @@ function GridCard({
         <>
           <NumberField label="Count" value={grid.count} min={1} onChange={(count) => set({ count })} />
           <NumberField label="Gutter" value={grid.gutter} onChange={(gutter) => set({ gutter })} />
-          <label className="lk-field">
+          <label className="rk-field">
             Alignment
             <select
               value={grid.alignment ?? 'stretch'}
@@ -199,7 +199,7 @@ function GridCard({
         onChange={(color) => set({ color })}
       />
 
-      <label className="lk-field" style={{ gridColumn: '1 / -1' }}>
+      <label className="rk-field" style={{ gridColumn: '1 / -1' }}>
         Target (CSS selector, empty for viewport)
         <input
           type="text"
@@ -235,7 +235,7 @@ function GridPanel({
 
   return (
     <div
-      className="lk-panel"
+      className="rk-panel"
       role="dialog"
       aria-label="Layout grids"
       // Shortcuts pause while a field has focus; Esc or Enter leaves the field
@@ -246,9 +246,9 @@ function GridPanel({
         }
       }}
     >
-      <div className="lk-panel-header">
+      <div className="rk-panel-header">
         Layout grids
-        <button type="button" className="lk-text-button" onClick={() => onChange([...grids, newGrid()])}>
+        <button type="button" className="rk-text-button" onClick={() => onChange([...grids, newGrid()])}>
           Add
         </button>
       </div>
@@ -260,11 +260,11 @@ function GridPanel({
           onRemove={() => onChange(grids.filter((_, i) => i !== index))}
         />
       ))}
-      <div className="lk-panel-footer">
-        <button type="button" className="lk-text-button lk-text-button-quiet" onClick={onReset}>
+      <div className="rk-panel-footer">
+        <button type="button" className="rk-text-button rk-text-button-quiet" onClick={onReset}>
           Reset
         </button>
-        <button type="button" className="lk-text-button" onClick={copy}>
+        <button type="button" className="rk-text-button" onClick={copy}>
           {copied ? 'Copied' : 'Copy props'}
         </button>
       </div>
@@ -294,9 +294,9 @@ export function Toolbar({
   const [panelOpen, setPanelOpen] = useState(false)
 
   return (
-    <div className="lk-dock" data-layoutkit="" data-rulers={rulers ? '' : undefined}>
+    <div className="rk-dock" data-rulerkit="" data-rulers={rulers ? '' : undefined}>
       {panelOpen && <GridPanel grids={gridConfig} onChange={onGridConfigChange} onReset={onGridConfigReset} />}
-      <div className="lk-toolbar" role="toolbar" aria-label="layoutkit">
+      <div className="rk-toolbar" role="toolbar" aria-label="rulerkit">
         <ToggleButton label="Measure (hold Option)" pressed={measure} onClick={() => onToggle('measure')}>
           {icons.measure}
         </ToggleButton>

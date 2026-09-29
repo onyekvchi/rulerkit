@@ -8,7 +8,7 @@ const GUIDE_SNAP = 3
 export interface MeasureProps {
   /** Colour of outlines, lines and labels */
   color: string
-  /** Selector for elements that can't be measured (layoutkit's own UI is always excluded) */
+  /** Selector for elements that can't be measured (rulerkit's own UI is always excluded) */
   ignore: string
   /** Visible guides; with an element selected, Option-hovering a guide measures to it */
   guides: Guide[]
@@ -146,7 +146,7 @@ export function Measure({ color, ignore, guides, onFocusChange }: MeasureProps) 
   guidesRef.current = guides
 
   useEffect(() => {
-    const excluded = `[data-layoutkit], ${ignore}`
+    const excluded = `[data-rulerkit], ${ignore}`
     const elementAtPointer = () => {
       const element = document.elementFromPoint(pointer.current.x, pointer.current.y)
       return element && element !== document.documentElement && !element.closest(excluded) ? element : null
@@ -258,7 +258,7 @@ export function Measure({ color, ignore, guides, onFocusChange }: MeasureProps) 
 
   return (
     <div
-      data-layoutkit=""
+      data-rulerkit=""
       aria-hidden="true"
       style={{ position: 'fixed', inset: 0, zIndex: 2147483646, pointerEvents: 'none' }}
     >

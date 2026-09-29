@@ -1,5 +1,5 @@
 {
-  "name": "layoutkit",
+  "name": "rulerkit",
   "version": "0.2.0",
   "description": "Figma-style layout inspection for your running app: measure distances, rulers with guides, and layout grids.",
   "keywords": [
@@ -15,13 +15,13 @@
   ],
   "license": "MIT",
   "author": "Onyekachi Mbaike",
-  "homepage": "https://github.com/onyekvchi/layoutkit#readme",
+  "homepage": "https://github.com/onyekvchi/rulerkit#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/onyekvchi/layoutkit.git"
+    "url": "git+https://github.com/onyekvchi/rulerkit.git"
   },
   "bugs": {
-    "url": "https://github.com/onyekvchi/layoutkit/issues"
+    "url": "https://github.com/onyekvchi/rulerkit/issues"
   },
   "type": "module",
   "main": "./dist/index.cjs",
