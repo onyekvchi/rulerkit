@@ -76,4 +76,35 @@ export function measure(a: Rect, b: Rect): MeasureLine[] {
   return gapLines(a, b)
 }
 
+export interface Guide {
+  id: string
+  /** 'x': a vertical line at `position` px from the left; 'y': horizontal, from the top */
+  axis: 'x' | 'y'
+  position: number
+}
+
+/**
+ * Distance from a box to a guide, drawn through the middle of the box. A guide
+ * that crosses the box measures to both of the box's edges.
+ */
+export function guideLines(rect: Rect, guide: Guide): MeasureLine[] {
+  const p = guide.position
+  if (guide.axis === 'x') {
+    const y = rect.top + rect.height / 2
+    if (p <= rect.left) return [{ x1: p, y1: y, x2: rect.left, y2: y }]
+    if (p >= rect.right) return [{ x1: rect.right, y1: y, x2: p, y2: y }]
+    return [
+      { x1: rect.left, y1: y, x2: p, y2: y },
+      { x1: p, y1: y, x2: rect.right, y2: y },
+    ]
+  }
+  const x = rect.left + rect.width / 2
+  if (p <= rect.top) return [{ x1: x, y1: p, x2: x, y2: rect.top }]
+  if (p >= rect.bottom) return [{ x1: x, y1: rect.bottom, x2: x, y2: p }]
+  return [
+    { x1: x, y1: rect.top, x2: x, y2: p },
+    { x1: x, y1: p, x2: x, y2: rect.bottom },
+  ]
+}
+
 export const round = (n: number) => Math.round(n * 10) / 10

@@ -1,8 +1,6 @@
 # layoutkit
 
-Figma-style layout inspection for your running app. Hold Option to see how far things are from each other, so you can tune spacing against the real page instead of guessing.
-
-Measuring is available now. Rulers and layout grids are next.
+Figma-style layout inspection for your running app: measure distances between elements, pull guides out of rulers, and lay columns, rows and baseline grids over the page. Tune spacing against the real page instead of guessing.
 
 ## Install
 
@@ -29,6 +27,8 @@ export default function App() {
 
 It renders nothing on the server and nothing in production builds unless you pass `productionEnabled`.
 
+A small toolbar in the bottom-left corner toggles each tool; the shortcuts below work too. Which tools are on is remembered between reloads.
+
 It sits alongside [DialKit](https://github.com/joshpuckett/dialkit) and [Agentation](https://agentation.com): their panels and toolbars are ignored when measuring.
 
 ## Measuring
@@ -50,13 +50,60 @@ Measurements track scrolling and resizing, so you can leave a pinned measurement
 
 Values are rounded to one decimal place, so sub-pixel layout shows up (e.g. `15.5`). Boxes are the elements' border boxes, not the tight bounds of their text.
 
+## Rulers and guides
+
+**Shift + R** toggles rulers along the top and left of the viewport. Numbers are viewport pixels.
+
+- The element you're hovering or have selected is marked on both rulers, with its start and end positions.
+- **Drag from a ruler** to add a guide: the top ruler makes horizontal guides, the left ruler vertical ones.
+- **Drag a guide** to move it; drop it back on its ruler to remove it. Hover a guide to see its position.
+- With an element selected, **Option-hover a guide** to measure the distance to it.
+
+Guides are saved per page (by pathname) and stay fixed to the viewport, so they're for checking alignment rather than marking a spot in a long scrolling page.
+
+## Layout grids
+
+**Ctrl + G** toggles layout grids. Define them with the `grids` prop; several can be stacked, like Figma's layout grids:
+
+```jsx
+<LayoutKit
+  grids={[
+    { type: 'columns', count: 12, gutter: 24, margin: 64 },
+    { type: 'baseline', size: 8 },
+  ]}
+/>
+```
+
+| Type | Options |
+| --- | --- |
+| `columns` / `rows` | `count`, `gutter`, `margin`, `alignment` (`'stretch'`, `'start'`, `'center'`, `'end'`), `size` (track width or height when not stretched) |
+| `baseline` | `size` (line spacing), `offset` (first line) |
+
+Every grid also takes `color` and `target`, a CSS selector of an element to lay the grid over instead of the viewport (e.g. `'main'`).
+
+The **grid settings** button in the toolbar opens a panel to edit grids live. Edits are saved in the browser and override the prop until you press **Reset**. **Copy props** copies the current grids as a `grids={...}` prop to paste back into your code.
+
 ## Props
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
-| `color` | `string` | `'#f24822'` | Colour of outlines, lines and labels |
+| `color` | `string` | `'#f24822'` | Colour of measurement outlines, lines, labels and ruler marks |
+| `guideColor` | `string` | `'#0d99ff'` | Colour of guides |
+| `grids` | `GridConfig[]` | `[]` | Layout grids shown with Ctrl + G |
 | `ignore` | `string` | — | Extra CSS selector for elements that can't be measured |
+| `toolbar` | `boolean` | `true` | Show the floating toolbar |
 | `productionEnabled` | `boolean` | `false` | Render in production builds too |
+
+## Shortcuts
+
+| Keys | Action |
+| --- | --- |
+| Hold **Option** | Measure |
+| **Shift + R** | Toggle rulers |
+| **Ctrl + G** | Toggle layout grids |
+| **Esc** | Clear the measurement selection |
+
+Shortcuts are ignored while you're typing in a field.
 
 ## Development
 
@@ -68,11 +115,6 @@ npm run typecheck
 ```
 
 To try it in another project before publishing, install it from the folder (`npm install -D ../layoutkit`). If the app then reports an invalid hook call, dedupe React in the app's bundler (in Vite: `resolve: { dedupe: ['react', 'react-dom'] }`).
-
-## Roadmap
-
-- Rulers along the viewport edges, with draggable guides
-- Layout grid overlays (columns, rows and baseline) with configurable count, gutter and margin
 
 ## License
 

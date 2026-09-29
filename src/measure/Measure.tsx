@@ -1,13 +1,19 @@
 import { type ReactNode, useEffect, useRef, useState } from 'react'
-import { measure, type MeasureLine, type Rect, round } from './geometry'
+import { type Guide, guideLines, measure, type MeasureLine, type Rect, round } from './geometry'
 
 const LABEL_FONT = '500 11px/1 ui-sans-serif, system-ui, sans-serif'
+// How close (px) the pointer must be to a guide to measure against it
+const GUIDE_SNAP = 3
 
 export interface MeasureProps {
   /** Colour of outlines, lines and labels */
   color: string
   /** Selector for elements that can't be measured (layoutkit's own UI is always excluded) */
   ignore: string
+  /** Visible guides; with an element selected, Option-hovering a guide measures to it */
+  guides: Guide[]
+  /** Called with the elements in focus (hovered, selected, pinned) so rulers can mark them */
+  onFocusChange: (elements: Element[]) => void
 }
 
 interface Selection {
@@ -122,18 +128,22 @@ function SizeLabel({ rect, color }: { rect: Rect; color: string }) {
  *     (hovering an ancestor of the selection measures the inside distances)
  *   - Shift-click a second element to pin it: the first stays selected and the
  *     measurement between the two stays on screen after Option is released
+ *   - with an element selected, hover a guide to measure to it
  * Esc clears the selection.
  */
-export function Measure({ color, ignore }: MeasureProps) {
+export function Measure({ color, ignore, guides, onFocusChange }: MeasureProps) {
   const [active, setActive] = useState(false)
   const [selection, setSelection] = useState<Selection>(EMPTY)
   const { selected, pinned } = selection
   const [picked, setPicked] = useState<Element | null>(null)
+  const [pickedGuide, setPickedGuide] = useState<Guide | null>(null)
   const [lift, setLift] = useState(0)
   const [, rerender] = useState(0)
   const pointer = useRef({ x: -1, y: -1 })
   // The hovered element after ↑/↓ steps, for the pointerdown handler
   const target = useRef<Element | null>(null)
+  const guidesRef = useRef(guides)
+  guidesRef.current = guides
 
   useEffect(() => {
     const excluded = `[data-layoutkit], ${ignore}`
@@ -142,7 +152,12 @@ export function Measure({ color, ignore }: MeasureProps) {
       return element && element !== document.documentElement && !element.closest(excluded) ? element : null
     }
     const pick = () => {
-      const element = elementAtPointer()
+      const { x, y } = pointer.current
+      const guide = guidesRef.current.find(
+        ({ axis, position }) => Math.abs((axis === 'x' ? x : y) - position) <= GUIDE_SNAP,
+      )
+      setPickedGuide(guide ?? null)
+      const element = guide ? null : elementAtPointer()
       setPicked((previous) => {
         if (previous !== element) setLift(0)
         return element
@@ -219,6 +234,11 @@ export function Measure({ color, ignore }: MeasureProps) {
     target.current = active ? hovered : null
   })
 
+  const focusedHover = active ? hovered : null
+  useEffect(() => {
+    onFocusChange([selected, pinned, focusedHover].filter((element): element is Element => Boolean(element)))
+  }, [selected, pinned, focusedHover, onFocusChange])
+
   // Drop elements that left the page (e.g. after navigating)
   if (selected && !selected.isConnected) setSelection(EMPTY)
   else if (pinned && !pinned.isConnected) setSelection({ selected, pinned: null })
@@ -232,6 +252,7 @@ export function Measure({ color, ignore }: MeasureProps) {
 
   let lines: MeasureLine[] = []
   if (selectedRect && pinnedRect) lines = measure(selectedRect, pinnedRect)
+  else if (selectedRect && active && pickedGuide) lines = guideLines(selectedRect, pickedGuide)
   else if (selectedRect && hoveredRect && hovered !== selected) lines = measure(selectedRect, hoveredRect)
   else if (hoveredRect && parentRect) lines = measure(hoveredRect, parentRect)
 
@@ -252,7 +273,7 @@ export function Measure({ color, ignore }: MeasureProps) {
       ))}
       {/* Size of the element in focus: the hovered one, or the selection on its own */}
       {!selected && hoveredRect && <SizeLabel rect={hoveredRect} color={color} />}
-      {selectedRect && !pinnedRect && (!hoveredRect || hovered === selected) && (
+      {selectedRect && !pinnedRect && !(active && pickedGuide) && (!hoveredRect || hovered === selected) && (
         <SizeLabel rect={selectedRect} color={color} />
       )}
     </div>
