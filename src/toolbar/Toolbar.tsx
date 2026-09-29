@@ -17,6 +17,18 @@ import {
 } from '../grids/Grids'
 
 const icons = {
+  eye: (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z" />
+      <circle cx="8" cy="8" r="2" />
+    </svg>
+  ),
+  eyeOff: (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6.6 3.7A6.4 6.4 0 018 3.5c4.1 0 6.5 4.5 6.5 4.5a11 11 0 01-1.6 2.1M4.2 4.9A10.6 10.6 0 001.5 8s2.4 4.5 6.5 4.5a6.3 6.3 0 003.4-1" />
+      <path d="M6.6 6.6a2 2 0 002.8 2.8M2 2l12 12" />
+    </svg>
+  ),
   grip: (
     <svg viewBox="0 0 6 16" fill="currentColor">
       <circle cx="1.5" cy="4.5" r="1" />
@@ -167,7 +179,7 @@ function GridCard({
     )
 
   return (
-    <div className="rk-grid-card">
+    <div className="rk-grid-card" data-hidden={grid.hidden ? '' : undefined}>
       <div className="rk-grid-card-header">
         <select
           aria-label="Grid type"
@@ -178,6 +190,16 @@ function GridCard({
           <option value="rows">Rows</option>
           <option value="baseline">Baseline</option>
         </select>
+        <button
+          type="button"
+          className="rk-icon-button"
+          aria-label={grid.hidden ? 'Show grid' : 'Hide grid'}
+          title={grid.hidden ? 'Show grid' : 'Hide grid'}
+          aria-pressed={!grid.hidden}
+          onClick={() => set({ hidden: !grid.hidden || undefined })}
+        >
+          {grid.hidden ? icons.eyeOff : icons.eye}
+        </button>
         <button type="button" className="rk-text-button rk-text-button-quiet" onClick={onRemove}>
           Remove
         </button>

@@ -7,6 +7,8 @@ interface GridBase {
   color?: string
   /** CSS selector of an element to lay the grid over; defaults to the viewport */
   target?: string
+  /** Keep the grid's settings but don't draw it */
+  hidden?: boolean
 }
 
 export interface TrackGrid extends GridBase {
@@ -59,6 +61,7 @@ export function Grids({ grids }: { grids: GridConfig[] }) {
   useLayoutChange()
 
   return grids.map((grid, index) => {
+    if (grid.hidden) return null
     const box = bounds(grid.target)
     const frame = {
       position: 'fixed' as const,

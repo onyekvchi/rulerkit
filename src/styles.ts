@@ -55,6 +55,12 @@ export const css = `
 .rk-panel-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; font-size: 12px; }
 .rk-grid-card { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 8px; margin-bottom: 8px; border-radius: 8px; border: 1px solid var(--rk-border); }
 .rk-grid-card-header { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.rk-grid-card-header select { flex: 1; }
+.rk-grid-card[data-hidden] > :not(.rk-grid-card-header) { opacity: 0.4; }
+.rk-icon-button { display: grid; place-items: center; flex-shrink: 0; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--rk-muted); cursor: pointer; }
+.rk-icon-button:hover { color: var(--rk-text); background: var(--rk-field); }
+.rk-icon-button[aria-pressed='true'] { color: var(--rk-text); }
+.rk-icon-button svg { width: 14px; height: 14px; }
 .rk-field { display: flex; flex-direction: column; gap: 3px; color: var(--rk-muted); }
 .rk-field input, .rk-field select, .rk-grid-card-header select { width: 100%; height: 24px; padding: 0 6px; border: 1px solid transparent; border-radius: 6px; background: var(--rk-field); color: var(--rk-text); font: inherit; }
 .rk-field input:focus, .rk-field select:focus { border-color: var(--rk-accent); outline: none; }

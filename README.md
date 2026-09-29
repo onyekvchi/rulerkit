@@ -79,9 +79,9 @@ Guides are saved per page (by pathname) and stay fixed to the viewport, so they'
 | `columns` / `rows` | `count`, `gutter`, `margin`, `alignment` (`'stretch'`, `'start'`, `'center'`, `'end'`), `size` (track width or height when not stretched) |
 | `baseline` | `size` (line spacing), `offset` (first line) |
 
-Every grid also takes `color` and `target`, a CSS selector of an element to lay the grid over instead of the viewport (e.g. `'main'`).
+Every grid also takes `color`, `target` (a CSS selector of an element to lay the grid over instead of the viewport, e.g. `'main'`) and `hidden` (keep the grid's settings but don't draw it).
 
-The **grid settings** button in the toolbar opens a panel to edit grids live, including each grid's colour and opacity. Edits are saved in the browser and override the prop until you press **Reset**. **Copy props** copies the current grids as a `grids={...}` prop to paste back into your code.
+The **grid settings** button in the toolbar opens a panel to edit grids live, including each grid's colour and opacity. The eye button on each grid hides or shows it without removing it. Edits are saved in the browser and override the prop until you press **Reset**. **Copy props** copies the current grids as a `grids={...}` prop to paste back into your code.
 
 ## Props
 
