@@ -53,7 +53,7 @@ export const css = `
 .rk-lint { position: fixed; inset: 0; z-index: 2147483642; pointer-events: none; }
 .rk-lint-box { position: fixed; outline: 1px dashed rgb(13 153 255 / 0.35); outline-offset: -0.5px; }
 .rk-lint-band { position: fixed; display: grid; place-items: center; background: rgb(13 153 255 / 0.14); }
-.rk-lint-band[data-off] { background: repeating-linear-gradient(45deg, rgb(229 72 77 / 0.5) 0 3px, rgb(229 72 77 / 0.18) 3px 6px); outline: 1px solid rgb(229 72 77 / 0.8); outline-offset: -0.5px; z-index: 1; }
+.rk-lint-band[data-off] { background: repeating-linear-gradient(45deg, rgb(229 72 77 / 0.22) 0 1px, rgb(229 72 77 / 0.06) 1px 6px); outline: 1px solid rgb(229 72 77 / 0.4); outline-offset: -0.5px; z-index: 1; }
 .rk-lint-label { padding: 1px 4px; border-radius: 3px; background: rgb(13 153 255 / 0.85); color: white; font-size: 9.5px; line-height: 13px; font-weight: 600; white-space: nowrap; }
 .rk-lint-band[data-off] .rk-lint-label { background: #e5484d; font-size: 10.5px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); }
 .rk-lint-label span { opacity: 0.85; font-weight: 500; }
