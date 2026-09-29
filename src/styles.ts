@@ -53,6 +53,8 @@ export const css = `
 .rk-divider { flex-shrink: 0; width: 1px; height: 18px; margin: 0 6px; background: var(--rk-border); order: -1; }
 .rk-toolbar[data-side='right'] .rk-divider { order: 99; }
 .rk-toolbar .rk-button { width: 32px; height: 32px; border-radius: 999px; flex-shrink: 0; }
+/* The tools row clips its overflow (for the expand animation), so focus rings sit inside the buttons */
+.rk-toolbar .rk-button:focus-visible, .rk-fab:focus-visible { outline: 2px solid var(--rk-accent); outline-offset: -2px; }
 @media (prefers-reduced-motion: reduce) { .rk-tools, .rk-dock { transition: none; } }
 .rk-button { display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--rk-muted); cursor: pointer; }
 .rk-button:hover { color: var(--rk-text); background: var(--rk-field); }
