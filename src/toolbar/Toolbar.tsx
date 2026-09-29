@@ -234,7 +234,18 @@ function GridPanel({
   }
 
   return (
-    <div className="lk-panel" role="dialog" aria-label="Layout grids">
+    <div
+      className="lk-panel"
+      role="dialog"
+      aria-label="Layout grids"
+      // Shortcuts pause while a field has focus; Esc or Enter leaves the field
+      onKeyDown={(event) => {
+        const field = event.target
+        if ((event.key === 'Escape' || event.key === 'Enter') && field instanceof HTMLInputElement) {
+          field.blur()
+        }
+      }}
+    >
       <div className="lk-panel-header">
         Layout grids
         <button type="button" className="lk-text-button" onClick={() => onChange([...grids, newGrid()])}>

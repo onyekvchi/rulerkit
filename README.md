@@ -103,7 +103,7 @@ The **grid settings** button in the toolbar opens a panel to edit grids live, in
 | **Ctrl + G** | Toggle layout grids |
 | **Esc** | Clear the measurement selection |
 
-Shortcuts are ignored while you're typing in a field.
+Shortcuts are ignored while you're typing in a field. In the grid panel, press **Esc** or **Enter** to leave a field and use them again.
 
 ## Development
 
