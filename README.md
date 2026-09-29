@@ -83,6 +83,21 @@ Every grid also takes `color`, `target` (a CSS selector of an element to lay the
 
 The **grid settings** button in the toolbar opens a panel to edit grids live, including each grid's colour and opacity. The eye button on each grid hides or shows it without removing it. The eyedropper next to **Target** lets you click an element on the page to lay the grid over it; rulerkit writes a stable selector for you (an id, a test attribute or a unique tag where possible, never utility classes). Edits are saved in the browser and override the prop until you press **Reset**. **Copy props** copies the current grids as a `grids={...}` prop to paste back into your code.
 
+## Spacing lint
+
+**Shift + L** (or the lint button in the toolbar) shows how the page is spaced. Every item gets a thin outline, and the gaps between neighbouring items and each container's padding are filled in with their values.
+
+Spacing on your scale is shaded blue. Anything off it gets a striped red band and a suggested value, like `14 → 16`, so mismatches stand out before you read a number. The toolbar button (and the closed round button) shows how many there are.
+
+By default spacing should be a multiple of 8, with 4 also allowed. Set your own scale with the `lint` prop:
+
+```jsx
+<RulerKit lint={{ base: 4 }} />
+<RulerKit lint={{ base: 8, allow: [4, 12] }} />
+```
+
+It measures element boxes as the browser lays them out, so each flag points at a gap, margin or padding set in your CSS. Padding comes from each container's CSS padding, and gaps created by `justify-content: space-between` (or `around`/`evenly`) are skipped, since nobody set those by hand. It covers the visible part of the page and re-scans as you scroll, resize or change styles.
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -90,6 +105,7 @@ The **grid settings** button in the toolbar opens a panel to edit grids live, in
 | `color` | `string` | `'#f24822'` | Colour of measurement outlines, lines, labels and ruler marks |
 | `guideColor` | `string` | `'#0d99ff'` | Colour of guides |
 | `grids` | `GridConfig[]` | `[]` | Layout grids shown with Shift + G |
+| `lint` | `{ base?: number; allow?: number[] }` | `{ base: 8, allow: [4] }` | Spacing scale for the lint |
 | `ignore` | `string` | — | Extra CSS selector for elements that can't be measured |
 | `toolbar` | `boolean` | `true` | Show the floating toolbar |
 | `productionEnabled` | `boolean` | `false` | Render in production builds too |
@@ -101,6 +117,7 @@ The **grid settings** button in the toolbar opens a panel to edit grids live, in
 | Hold **Option** | Measure (when switched on in the toolbar) |
 | **Shift + R** | Toggle rulers |
 | **Shift + G** or **Ctrl + G** | Toggle layout grids |
+| **Shift + L** | Toggle the spacing lint |
 | **Esc** | Clear the measurement selection |
 
 Shortcuts are ignored while you're typing in a field. In the grid panel, press **Esc** or **Enter** to leave a field and use them again.

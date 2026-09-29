@@ -46,6 +46,17 @@ export const css = `
 .rk-fab { position: relative; display: grid; place-items: center; flex-shrink: 0; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--rk-text); cursor: inherit; transition: background-color 120ms; }
 .rk-fab:hover { background: var(--rk-field); }
 .rk-fab svg { width: 18px; height: 18px; }
+.rk-button { position: relative; }
+.rk-count { position: absolute; top: -2px; right: -3px; min-width: 15px; height: 15px; padding: 0 4px; border-radius: 999px; background: #e5484d; color: white; font-size: 9.5px; line-height: 15px; font-weight: 600; text-align: center; box-shadow: 0 0 0 2px rgb(22 22 24); pointer-events: none; }
+.rk-fab-count { top: 0; right: 0; }
+/* Spacing lint overlay */
+.rk-lint { position: fixed; inset: 0; z-index: 2147483642; pointer-events: none; }
+.rk-lint-box { position: fixed; outline: 1px dashed rgb(13 153 255 / 0.35); outline-offset: -0.5px; }
+.rk-lint-band { position: fixed; display: grid; place-items: center; background: rgb(13 153 255 / 0.14); }
+.rk-lint-band[data-off] { background: repeating-linear-gradient(45deg, rgb(229 72 77 / 0.5) 0 3px, rgb(229 72 77 / 0.18) 3px 6px); outline: 1px solid rgb(229 72 77 / 0.8); outline-offset: -0.5px; z-index: 1; }
+.rk-lint-label { padding: 1px 4px; border-radius: 3px; background: rgb(13 153 255 / 0.85); color: white; font-size: 9.5px; line-height: 13px; font-weight: 600; white-space: nowrap; }
+.rk-lint-band[data-off] .rk-lint-label { background: #e5484d; font-size: 10.5px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); }
+.rk-lint-label span { opacity: 0.85; font-weight: 500; }
 .rk-fab-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--rk-accent); box-shadow: 0 0 0 2px rgb(22 22 24); }
 .rk-tools { display: grid; grid-template-columns: 0fr; opacity: 0; transition: grid-template-columns 260ms cubic-bezier(0.23, 1, 0.32, 1), opacity 160ms ease-out; }
 .rk-toolbar[data-expanded] .rk-tools { grid-template-columns: 1fr; opacity: 1; }

@@ -20,6 +20,13 @@ import {
 } from '../grids/Grids'
 
 const icons = {
+  lint: (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2.5" y="2.5" width="4" height="4" rx="0.75" />
+      <rect x="9.5" y="9.5" width="4" height="4" rx="0.75" />
+      <path d="M8 4.5h5.5M11.5 3v3M4.5 8v5.5M3 11.5h3" />
+    </svg>
+  ),
   eyedropper: (
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
       <path d="M10.2 2.7a1.9 1.9 0 012.7 2.7l-1.4 1.4.7.7-1.1 1.1-3.5-3.5 1.1-1.1.7.7z" />
@@ -374,7 +381,10 @@ export interface ToolbarProps {
   measure: boolean
   rulers: boolean
   grids: boolean
-  onToggle: (tool: 'measure' | 'rulers' | 'grids') => void
+  lint: boolean
+  /** Off-scale spacings found by the lint, shown as a count */
+  lintIssues: number
+  onToggle: (tool: 'measure' | 'rulers' | 'grids' | 'lint') => void
   gridConfig: GridConfig[]
   onGridConfigChange: (grids: GridConfig[]) => void
   onGridConfigReset: () => void
@@ -472,6 +482,8 @@ export function Toolbar({
   measure,
   rulers,
   grids,
+  lint,
+  lintIssues,
   onToggle,
   gridConfig,
   onGridConfigChange,
@@ -539,7 +551,13 @@ export function Toolbar({
           onClick={toggleExpanded}
         >
           {expanded ? icons.close : icons.logo}
-          {!expanded && (rulers || grids) && <span className="rk-fab-dot" aria-hidden="true" />}
+          {!expanded && lint && lintIssues > 0 ? (
+            <span className="rk-count rk-fab-count" aria-hidden="true">
+              {lintIssues}
+            </span>
+          ) : (
+            !expanded && (rulers || grids || lint) && <span className="rk-fab-dot" aria-hidden="true" />
+          )}
         </button>
         {/* Width animates from 0 via grid-template-columns; inert while collapsed */}
         <div className="rk-tools" inert={!expanded}>
@@ -553,6 +571,22 @@ export function Toolbar({
             </ToggleButton>
             <ToggleButton label="Layout grids (Shift G)" pressed={grids} onClick={() => onToggle('grids')}>
               {icons.grids}
+            </ToggleButton>
+            <ToggleButton
+              label={
+                lint && lintIssues > 0
+                  ? `Spacing lint (Shift L), ${lintIssues} ${lintIssues === 1 ? 'issue' : 'issues'}`
+                  : 'Spacing lint (Shift L)'
+              }
+              pressed={lint}
+              onClick={() => onToggle('lint')}
+            >
+              {icons.lint}
+              {lint && lintIssues > 0 && (
+                <span className="rk-count" aria-hidden="true">
+                  {lintIssues > 99 ? '99+' : lintIssues}
+                </span>
+              )}
             </ToggleButton>
             <ToggleButton label="Grid settings" pressed={panelOpen} onClick={() => setPanelOpen((open) => !open)}>
               {icons.settings}

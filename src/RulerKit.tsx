@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { type GridConfig, Grids } from './grids/Grids'
 import { forget, isTyping, usePathname, usePersistentState } from './lib/state'
+import type { LintOptions } from './lint/analyze'
+import { Lint } from './lint/Lint'
 import type { Guide } from './measure/geometry'
 import { Measure } from './measure/Measure'
 import { Rulers } from './rulers/Rulers'
@@ -19,6 +21,7 @@ const DEFAULT_IGNORE = [
 
 const NO_GRIDS: GridConfig[] = []
 const NO_GUIDES: Guide[] = []
+const DEFAULT_LINT: LintOptions = { base: 8, allow: [4] }
 
 export interface RulerKitProps {
   /** Colour of outlines, measurement lines, labels and ruler marks. Defaults to Figma's redline orange. */
@@ -29,6 +32,11 @@ export interface RulerKitProps {
   grids?: GridConfig[]
   /** Extra selector for elements that can't be measured, e.g. your own dev tools */
   ignore?: string
+  /**
+   * Spacing lint (Shift + L): spacing should be a multiple of `base`, plus any
+   * `allow` values. Defaults to { base: 8, allow: [4] }.
+   */
+  lint?: LintOptions
   /** Show the floating toolbar. Shortcuts work either way. Defaults to true. */
   toolbar?: boolean
   /** Render in production builds too. Defaults to false. */
@@ -45,6 +53,7 @@ interface Tools {
   measure: boolean
   rulers: boolean
   grids: boolean
+  lint?: boolean
 }
 
 function Kit({
@@ -53,6 +62,7 @@ function Kit({
   grids: gridsProp,
   ignore,
   toolbar,
+  lint,
 }: Required<Omit<RulerKitProps, 'productionEnabled'>>) {
   const [tools, setTools] = usePersistentState<Tools>('tools', { measure: true, rulers: false, grids: false })
   const [gridConfig, setGridConfig] = usePersistentState<GridConfig[] | null>('grids', null)
@@ -60,6 +70,7 @@ function Kit({
   const [guides, setGuides] = usePersistentState<Guide[]>(`guides:${pathname}`, NO_GUIDES)
   const [focus, setFocus] = useState<Element[]>([])
   const onFocusChange = useCallback((elements: Element[]) => setFocus(elements), [])
+  const [lintIssues, setLintIssues] = useState(0)
 
   const toggle = useCallback(
     (tool: keyof Tools) => setTools((current) => ({ ...current, [tool]: !current[tool] })),
@@ -72,6 +83,8 @@ function Kit({
       const shift = event.shiftKey && !event.ctrlKey && !event.altKey
       if (event.code === 'KeyR' && shift) {
         toggle('rulers')
+      } else if (event.code === 'KeyL' && shift) {
+        toggle('lint')
       } else if (event.code === 'KeyG' && (shift || (event.ctrlKey && !event.shiftKey && !event.altKey))) {
         // Shift + G pairs with Shift + R; Ctrl + G matches Figma
         event.preventDefault()
@@ -89,6 +102,7 @@ function Kit({
     <div data-rulerkit="">
       <style>{css}</style>
       {tools.grids && <Grids grids={activeGrids} />}
+      {tools.lint && <Lint options={lint} excluded={`[data-rulerkit], ${ignoreSelector}`} onIssues={setLintIssues} />}
       {tools.rulers && (
         <Rulers
           focus={focus}
@@ -111,6 +125,8 @@ function Kit({
           measure={tools.measure}
           rulers={tools.rulers}
           grids={tools.grids}
+          lint={Boolean(tools.lint)}
+          lintIssues={lintIssues}
           onToggle={toggle}
           gridConfig={activeGrids}
           onGridConfigChange={setGridConfig}
@@ -127,7 +143,7 @@ function Kit({
 
 /**
  * Layout inspection for your running app: Option-hover measuring, rulers with
- * guides (Shift + R) and layout grids (Shift + G). Mount it once, anywhere in
+ * guides (Shift + R), layout grids (Shift + G) and a spacing lint (Shift + L). Mount it once, anywhere in
  * your tree.
  */
 export function RulerKit({
@@ -136,6 +152,7 @@ export function RulerKit({
   grids = NO_GRIDS,
   ignore = '',
   toolbar = true,
+  lint = DEFAULT_LINT,
   productionEnabled = false,
 }: RulerKitProps) {
   // Client only: renders nothing on the server or before hydration
@@ -144,5 +161,5 @@ export function RulerKit({
 
   if (!mounted || (isProduction() && !productionEnabled)) return null
 
-  return <Kit color={color} guideColor={guideColor} grids={grids} ignore={ignore} toolbar={toolbar} />
+  return <Kit color={color} guideColor={guideColor} grids={grids} ignore={ignore} toolbar={toolbar} lint={lint} />
 }
