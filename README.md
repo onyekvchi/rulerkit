@@ -27,13 +27,13 @@ export default function App() {
 
 It renders nothing on the server and nothing in production builds unless you pass `productionEnabled`.
 
-A small toolbar in the bottom-left corner toggles each tool; the shortcuts below work too. Which tools are on is remembered between reloads.
+A small toolbar in the bottom-left corner switches measuring, rulers and grids on and off and opens the grid settings; the shortcuts below work too. Which tools are on is remembered between reloads.
 
 It sits alongside [DialKit](https://github.com/joshpuckett/dialkit) and [Agentation](https://agentation.com): their panels and toolbars are ignored when measuring.
 
 ## Measuring
 
-Hold **Option** (Alt) the whole time:
+With **Measure** switched on in the toolbar (the default), hold **Option** (Alt) the whole time:
 
 | Action | Result |
 | --- | --- |
@@ -63,7 +63,7 @@ Guides are saved per page (by pathname) and stay fixed to the viewport, so they'
 
 ## Layout grids
 
-**Ctrl + G** toggles layout grids. Define them with the `grids` prop; several can be stacked, like Figma's layout grids:
+**Shift + G** (or Figma's **Ctrl + G**) toggles layout grids. Define them with the `grids` prop; several can be stacked, like Figma's layout grids:
 
 ```jsx
 <LayoutKit
@@ -89,7 +89,7 @@ The **grid settings** button in the toolbar opens a panel to edit grids live, in
 | --- | --- | --- | --- |
 | `color` | `string` | `'#f24822'` | Colour of measurement outlines, lines, labels and ruler marks |
 | `guideColor` | `string` | `'#0d99ff'` | Colour of guides |
-| `grids` | `GridConfig[]` | `[]` | Layout grids shown with Ctrl + G |
+| `grids` | `GridConfig[]` | `[]` | Layout grids shown with Shift + G |
 | `ignore` | `string` | — | Extra CSS selector for elements that can't be measured |
 | `toolbar` | `boolean` | `true` | Show the floating toolbar |
 | `productionEnabled` | `boolean` | `false` | Render in production builds too |
@@ -98,9 +98,9 @@ The **grid settings** button in the toolbar opens a panel to edit grids live, in
 
 | Keys | Action |
 | --- | --- |
-| Hold **Option** | Measure |
+| Hold **Option** | Measure (when switched on in the toolbar) |
 | **Shift + R** | Toggle rulers |
-| **Ctrl + G** | Toggle layout grids |
+| **Shift + G** or **Ctrl + G** | Toggle layout grids |
 | **Esc** | Clear the measurement selection |
 
 Shortcuts are ignored while you're typing in a field. In the grid panel, press **Esc** or **Enter** to leave a field and use them again.

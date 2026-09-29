@@ -303,7 +303,7 @@ export function Toolbar({
         <ToggleButton label="Rulers (Shift R)" pressed={rulers} onClick={() => onToggle('rulers')}>
           {icons.rulers}
         </ToggleButton>
-        <ToggleButton label="Layout grids (Ctrl G)" pressed={grids} onClick={() => onToggle('grids')}>
+        <ToggleButton label="Layout grids (Shift G)" pressed={grids} onClick={() => onToggle('grids')}>
           {icons.grids}
         </ToggleButton>
         <ToggleButton label="Grid settings" pressed={panelOpen} onClick={() => setPanelOpen((open) => !open)}>

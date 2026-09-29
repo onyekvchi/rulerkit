@@ -25,7 +25,7 @@ export interface LayoutKitProps {
   color?: string
   /** Colour of ruler guides. Defaults to Figma's guide blue. */
   guideColor?: string
-  /** Layout grids to show with Ctrl + G. Edits made in the grid panel override these until reset. */
+  /** Layout grids to show with Shift + G. Edits made in the grid panel override these until reset. */
   grids?: GridConfig[]
   /** Extra selector for elements that can't be measured, e.g. your own dev tools */
   ignore?: string
@@ -41,6 +41,7 @@ declare const process: { env?: { NODE_ENV?: string } }
 const isProduction = () => typeof process !== 'undefined' && process.env?.NODE_ENV === 'production'
 
 interface Tools {
+  /** Whether holding Option measures */
   measure: boolean
   rulers: boolean
   grids: boolean
@@ -68,9 +69,11 @@ function Kit({
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (isTyping(event.target) || event.metaKey) return
-      if (event.code === 'KeyR' && event.shiftKey && !event.ctrlKey && !event.altKey) {
+      const shift = event.shiftKey && !event.ctrlKey && !event.altKey
+      if (event.code === 'KeyR' && shift) {
         toggle('rulers')
-      } else if (event.code === 'KeyG' && event.ctrlKey && !event.shiftKey && !event.altKey) {
+      } else if (event.code === 'KeyG' && (shift || (event.ctrlKey && !event.shiftKey && !event.altKey))) {
+        // Shift + G pairs with Shift + R; Ctrl + G matches Figma
         event.preventDefault()
         toggle('grids')
       }
@@ -104,7 +107,9 @@ function Kit({
       )}
       {toolbar && (
         <Toolbar
-          {...tools}
+          measure={tools.measure}
+          rulers={tools.rulers}
+          grids={tools.grids}
           onToggle={toggle}
           gridConfig={activeGrids}
           onGridConfigChange={setGridConfig}
@@ -120,7 +125,7 @@ function Kit({
 
 /**
  * Layout inspection for your running app: Option-hover measuring, rulers with
- * guides (Shift + R) and layout grids (Ctrl + G). Mount it once, anywhere in
+ * guides (Shift + R) and layout grids (Shift + G). Mount it once, anywhere in
  * your tree.
  */
 export function LayoutKit({
