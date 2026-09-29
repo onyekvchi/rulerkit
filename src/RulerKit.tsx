@@ -83,6 +83,7 @@ function Kit({
   }, [toggle])
 
   const activeGrids = gridConfig ?? gridsProp
+  const ignoreSelector = ignore ? `${DEFAULT_IGNORE}, ${ignore}` : DEFAULT_IGNORE
 
   return (
     <div data-rulerkit="">
@@ -100,7 +101,7 @@ function Kit({
       {tools.measure && (
         <Measure
           color={color}
-          ignore={ignore ? `${DEFAULT_IGNORE}, ${ignore}` : DEFAULT_IGNORE}
+          ignore={ignoreSelector}
           guides={tools.rulers ? guides : NO_GUIDES}
           onFocusChange={onFocusChange}
         />
@@ -117,6 +118,7 @@ function Kit({
             forget('grids')
             setGridConfig(null)
           }}
+          ignore={ignoreSelector}
         />
       )}
     </div>

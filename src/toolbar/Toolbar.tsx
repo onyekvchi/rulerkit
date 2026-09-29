@@ -3,11 +3,14 @@ import {
   type MouseEvent as ReactMouseEvent,
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
+  useCallback,
+  useId,
   useRef,
   useState,
 } from 'react'
 import { useLayoutChange, usePersistentState } from '../lib/state'
 import { RULER_SIZE } from '../styles'
+import { TargetPicker } from './TargetPicker'
 import {
   DEFAULT_BASELINE_COLOR,
   DEFAULT_TRACK_COLOR,
@@ -17,6 +20,12 @@ import {
 } from '../grids/Grids'
 
 const icons = {
+  eyedropper: (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M10.2 2.7a1.9 1.9 0 012.7 2.7l-1.4 1.4.7.7-1.1 1.1-3.5-3.5 1.1-1.1.7.7z" />
+      <path d="M8.1 5.5L3.2 10.4a1.3 1.3 0 00-.4.9v1.9h1.9a1.3 1.3 0 00.9-.4l4.9-4.9" />
+    </svg>
+  ),
   eye: (
     <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
       <path d="M1.5 8s2.4-4.5 6.5-4.5S14.5 8 14.5 8s-2.4 4.5-6.5 4.5S1.5 8 1.5 8z" />
@@ -165,11 +174,17 @@ function GridCard({
   grid,
   onChange,
   onRemove,
+  picking,
+  onTogglePick,
 }: {
   grid: GridConfig
   onChange: (grid: GridConfig) => void
   onRemove: () => void
+  /** Whether the eyedropper is picking this grid's target */
+  picking: boolean
+  onTogglePick: () => void
 }) {
+  const targetId = useId()
   const set = (patch: Partial<GridConfig>) => onChange({ ...grid, ...patch } as GridConfig)
   const changeType = (type: GridConfig['type']) =>
     onChange(
@@ -240,15 +255,29 @@ function GridCard({
         onChange={(color) => set({ color })}
       />
 
-      <label className="rk-field" style={{ gridColumn: '1 / -1' }}>
-        Target (CSS selector, empty for viewport)
-        <input
-          type="text"
-          placeholder="viewport"
-          value={grid.target ?? ''}
-          onChange={(event) => set({ target: event.target.value || undefined })}
-        />
-      </label>
+      <div className="rk-field" style={{ gridColumn: '1 / -1' }}>
+        <label htmlFor={targetId}>Target (CSS selector, empty for viewport)</label>
+        <div className="rk-target-row">
+          <input
+            id={targetId}
+            type="text"
+            placeholder="viewport"
+            value={grid.target ?? ''}
+            onChange={(event) => set({ target: event.target.value || undefined })}
+          />
+          <button
+            type="button"
+            className="rk-icon-button rk-icon-button-field"
+            aria-label={picking ? 'Cancel picking' : 'Pick target element'}
+            title={picking ? 'Cancel (Esc)' : 'Pick an element on the page'}
+            aria-pressed={picking}
+            onClick={onTogglePick}
+          >
+            {icons.eyedropper}
+          </button>
+        </div>
+        {picking && <span className="rk-hint">Click an element to use it · Esc to cancel</span>}
+      </div>
     </div>
   )
 }
@@ -257,12 +286,29 @@ function GridPanel({
   grids,
   onChange,
   onReset,
+  ignore,
 }: {
   grids: GridConfig[]
   onChange: (grids: GridConfig[]) => void
   onReset: () => void
+  ignore: string
 }) {
   const [copied, setCopied] = useState(false)
+  // Index of the grid whose target is being picked with the eyedropper
+  const [picking, setPicking] = useState<number | null>(null)
+
+  const updateGrid = (index: number, next: GridConfig) =>
+    onChange(grids.map((current, i) => (i === index ? next : current)))
+
+  const onPick = useCallback(
+    (selector: string) => {
+      if (picking === null) return
+      onChange(grids.map((grid, i) => (i === picking ? { ...grid, target: selector } : grid)))
+      setPicking(null)
+    },
+    [picking, grids, onChange],
+  )
+  const onCancelPick = useCallback(() => setPicking(null), [])
 
   const copy = async () => {
     try {
@@ -275,6 +321,9 @@ function GridPanel({
   }
 
   return (
+    <>
+    {/* Rendered beside the panel: its backdrop-filter would trap fixed positioning */}
+    {picking !== null && <TargetPicker ignore={ignore} onPick={onPick} onCancel={onCancelPick} />}
     <div
       className="rk-panel"
       role="dialog"
@@ -297,8 +346,13 @@ function GridPanel({
         <GridCard
           key={index}
           grid={grid}
-          onChange={(next) => onChange(grids.map((current, i) => (i === index ? next : current)))}
-          onRemove={() => onChange(grids.filter((_, i) => i !== index))}
+          onChange={(next) => updateGrid(index, next)}
+          onRemove={() => {
+            setPicking(null)
+            onChange(grids.filter((_, i) => i !== index))
+          }}
+          picking={picking === index}
+          onTogglePick={() => setPicking((current) => (current === index ? null : index))}
         />
       ))}
       <div className="rk-panel-footer">
@@ -310,6 +364,7 @@ function GridPanel({
         </button>
       </div>
     </div>
+    </>
   )
 }
 
@@ -321,6 +376,8 @@ export interface ToolbarProps {
   gridConfig: GridConfig[]
   onGridConfigChange: (grids: GridConfig[]) => void
   onGridConfigReset: () => void
+  /** Selector for other tools' UI, which the target eyedropper skips */
+  ignore: string
 }
 
 interface Point {
@@ -416,6 +473,7 @@ export function Toolbar({
   gridConfig,
   onGridConfigChange,
   onGridConfigReset,
+  ignore,
 }: ToolbarProps) {
   const [panelOpen, setPanelOpen] = useState(false)
   const drag = useDraggable(rulers)
@@ -449,7 +507,9 @@ export function Toolbar({
       data-dragging={drag.dragging ? '' : undefined}
       style={dockStyle}
     >
-      {panelOpen && <GridPanel grids={gridConfig} onChange={onGridConfigChange} onReset={onGridConfigReset} />}
+      {panelOpen && (
+        <GridPanel grids={gridConfig} onChange={onGridConfigChange} onReset={onGridConfigReset} ignore={ignore} />
+      )}
       <div
         ref={drag.ref}
         className="rk-toolbar"

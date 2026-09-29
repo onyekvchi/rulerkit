@@ -81,7 +81,7 @@ Guides are saved per page (by pathname) and stay fixed to the viewport, so they'
 
 Every grid also takes `color`, `target` (a CSS selector of an element to lay the grid over instead of the viewport, e.g. `'main'`) and `hidden` (keep the grid's settings but don't draw it).
 
-The **grid settings** button in the toolbar opens a panel to edit grids live, including each grid's colour and opacity. The eye button on each grid hides or shows it without removing it. Edits are saved in the browser and override the prop until you press **Reset**. **Copy props** copies the current grids as a `grids={...}` prop to paste back into your code.
+The **grid settings** button in the toolbar opens a panel to edit grids live, including each grid's colour and opacity. The eye button on each grid hides or shows it without removing it. The eyedropper next to **Target** lets you click an element on the page to lay the grid over it; rulerkit writes a stable selector for you (an id, a test attribute or a unique tag where possible, never utility classes). Edits are saved in the browser and override the prop until you press **Reset**. **Copy props** copies the current grids as a `grids={...}` prop to paste back into your code.
 
 ## Props
 

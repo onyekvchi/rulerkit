@@ -61,6 +61,15 @@ export const css = `
 .rk-icon-button:hover { color: var(--rk-text); background: var(--rk-field); }
 .rk-icon-button[aria-pressed='true'] { color: var(--rk-text); }
 .rk-icon-button svg { width: 14px; height: 14px; }
+.rk-icon-button-field { background: var(--rk-field); }
+.rk-icon-button[aria-pressed='true'].rk-icon-button-field { background: rgb(13 153 255 / 0.22); color: var(--rk-text); }
+.rk-target-row { display: flex; gap: 4px; }
+.rk-target-row input { flex: 1; min-width: 0; }
+.rk-hint { color: var(--rk-accent); }
+.rk-picker { position: fixed; inset: 0; z-index: 2147483646; pointer-events: none; }
+.rk-picker-box { position: fixed; outline: 1.5px solid var(--rk-accent); background: rgb(13 153 255 / 0.08); }
+.rk-picker-label { position: fixed; display: flex; gap: 6px; padding: 3px 6px; border-radius: 4px; background: var(--rk-accent); color: white; font: 500 11px/1.3 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: nowrap; }
+.rk-picker-label span { opacity: 0.75; }
 .rk-field { display: flex; flex-direction: column; gap: 3px; color: var(--rk-muted); }
 .rk-field input, .rk-field select, .rk-grid-card-header select { width: 100%; height: 24px; padding: 0 6px; border: 1px solid transparent; border-radius: 6px; background: var(--rk-field); color: var(--rk-text); font: inherit; }
 .rk-field input:focus, .rk-field select:focus { border-color: var(--rk-accent); outline: none; }
