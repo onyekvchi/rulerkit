@@ -392,28 +392,29 @@ const DRAG_THRESHOLD = 4
 // Space kept between the toolbar and the viewport edges (or the rulers)
 const EDGE = 8
 
-/**
- * Keeps the toolbar's top-left corner inside the viewport, clear of the
- * rulers when they're showing.
- */
-function clamp(point: Point, size: { width: number; height: number }, rulers: boolean): Point {
+// The round button's size (36px button + 4px padding + 1px border each side).
+// Positions are the circle's top-left: it stays put when the toolbar expands
+// or collapses, and the pill always grows from it towards the middle.
+const CIRCLE = 46
+
+/** Keeps the circle inside the viewport, clear of the rulers when they're showing */
+function clamp(point: Point, rulers: boolean): Point {
   const min = rulers ? RULER_SIZE + EDGE : EDGE
   return {
-    x: Math.round(Math.min(Math.max(point.x, min), window.innerWidth - size.width - EDGE)),
-    y: Math.round(Math.min(Math.max(point.y, min), window.innerHeight - size.height - EDGE)),
+    x: Math.round(Math.min(Math.max(point.x, min), window.innerWidth - CIRCLE - EDGE)),
+    y: Math.round(Math.min(Math.max(point.y, min), window.innerHeight - CIRCLE - EDGE)),
   }
 }
 
 /**
  * Lets the toolbar be dragged anywhere, from any part of it. Returns the
- * position to render (null keeps the default corner), whether a drag is in
- * progress, and handlers for the toolbar element.
+ * circle position to render (null keeps the default corner), whether a drag
+ * is in progress, and handlers for the toolbar element.
  */
 function useDraggable(rulers: boolean) {
   const [saved, setSaved] = usePersistentState<Point | null>('position', null)
   const [live, setLive] = useState<Point | null>(null)
   const ref = useRef<HTMLDivElement>(null)
-  const size = useRef({ width: 44, height: 44 })
   // Set when a press turned into a drag, so the click that ends it is ignored
   const dragged = useRef(false)
   useLayoutChange()
@@ -422,7 +423,8 @@ function useDraggable(rulers: boolean) {
     const toolbar = ref.current
     if (event.button !== 0 || !toolbar) return
     const rect = toolbar.getBoundingClientRect()
-    size.current = { width: rect.width, height: rect.height }
+    // The circle is at the pill's right end when it opens leftwards
+    const circle = { x: toolbar.dataset.side === 'right' ? rect.right - CIRCLE : rect.left, y: rect.top }
     const start = { x: event.clientX, y: event.clientY }
     let last: Point | null = null
     dragged.current = false
@@ -432,7 +434,7 @@ function useDraggable(rulers: boolean) {
       const dy = move.clientY - start.y
       if (!dragged.current && Math.hypot(dx, dy) < DRAG_THRESHOLD) return
       dragged.current = true
-      last = clamp({ x: rect.left + dx, y: rect.top + dy }, size.current, rulers)
+      last = clamp({ x: circle.x + dx, y: circle.y + dy }, rulers)
       setLive(last)
     }
     const onUp = () => {
@@ -459,7 +461,7 @@ function useDraggable(rulers: boolean) {
   return {
     ref,
     // Re-clamped every render so a resized window or the rulers appearing can't strand it
-    position: current && clamp(current, size.current, rulers),
+    position: current && clamp(current, rulers),
     dragging: live !== null,
     onPointerDown,
     onClickCapture,
@@ -482,23 +484,22 @@ export function Toolbar({
   const drag = useDraggable(rulers)
   const { position } = drag
 
-  // Anchor the dock at the toolbar's corner nearest the viewport edge, so the
+  // Pin the dock to the circle on the side nearest the viewport edge, so the
   // toolbar expands and the grid panel opens towards the middle of the screen
   const dockStyle: CSSProperties = {}
   let panelBelow = false
   let alignRight = false
   if (position) {
-    const { width, height } = drag.ref.current?.getBoundingClientRect() ?? { width: 44, height: 44 }
-    panelBelow = position.y + height / 2 < window.innerHeight / 2
-    alignRight = position.x + width / 2 > window.innerWidth / 2
+    panelBelow = position.y + CIRCLE / 2 < window.innerHeight / 2
+    alignRight = position.x + CIRCLE / 2 > window.innerWidth / 2
     dockStyle.left = alignRight ? 'auto' : position.x
-    dockStyle.right = alignRight ? window.innerWidth - position.x - width : 'auto'
+    dockStyle.right = alignRight ? window.innerWidth - position.x - CIRCLE : 'auto'
     dockStyle.top = panelBelow ? position.y : 'auto'
-    dockStyle.bottom = panelBelow ? 'auto' : window.innerHeight - position.y - height
+    dockStyle.bottom = panelBelow ? 'auto' : window.innerHeight - position.y - CIRCLE
     dockStyle.flexDirection = panelBelow ? 'column-reverse' : 'column'
     dockStyle.alignItems = alignRight ? 'flex-end' : 'flex-start'
     // The panel can only be as tall as the space on the side it opens towards
-    const space = panelBelow ? window.innerHeight - position.y - height : position.y
+    const space = panelBelow ? window.innerHeight - position.y - CIRCLE : position.y
     ;(dockStyle as Record<string, string | number>)['--rk-panel-max'] = `${Math.max(space - 8 - EDGE, 160)}px`
   }
 
