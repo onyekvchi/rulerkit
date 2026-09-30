@@ -113,14 +113,16 @@ function Kit({
     const onKeyDown = (event: KeyboardEvent) => {
       if (isTyping(event.target) || event.metaKey) return
       const shift = event.shiftKey && !event.ctrlKey && !event.altKey
+      // A held shortcut repeats keydown; it should switch the tool once, not strobe it
+      const once = (tool: keyof Tools) => !event.repeat && toggle(tool)
       if (event.code === 'KeyR' && shift) {
-        toggle('rulers')
+        once('rulers')
       } else if (event.code === 'KeyL' && shift) {
-        toggle('lint')
+        once('lint')
       } else if (event.code === 'KeyG' && (shift || (event.ctrlKey && !event.shiftKey && !event.altKey))) {
         // Shift + G pairs with Shift + R; Ctrl + G matches Figma
         event.preventDefault()
-        toggle('grids')
+        once('grids')
       }
     }
     window.addEventListener('keydown', onKeyDown)
