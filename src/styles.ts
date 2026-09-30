@@ -9,6 +9,9 @@ export const css = `
   --rk-text: rgb(255 255 255 / 0.9);
   --rk-muted: rgb(255 255 255 / 0.5);
   --rk-field: rgb(255 255 255 / 0.06);
+  --rk-tick: rgb(255 255 255 / 0.2);
+  --rk-tick-text: rgb(255 255 255 / 0.42);
+  --rk-hatch: rgb(255 255 255 / 0.07);
   --rk-accent: #0d99ff;
   font: 500 11px/1.4 ui-sans-serif, system-ui, sans-serif;
   font-variant-numeric: tabular-nums;
@@ -22,6 +25,9 @@ export const css = `
 .rk-ruler-y { top: ${RULER_SIZE}px; left: 0; bottom: 0; width: ${RULER_SIZE}px; border-right: 1px solid var(--rk-border); cursor: col-resize; }
 .rk-ruler-corner { position: fixed; z-index: 2147483645; top: 0; left: 0; width: ${RULER_SIZE}px; height: ${RULER_SIZE}px; background: var(--rk-bg); border-right: 1px solid var(--rk-border); border-bottom: 1px solid var(--rk-border); }
 .rk-ruler canvas { position: absolute; inset: 0; pointer-events: none; }
+.rk-ruler-x canvas { mask-image: linear-gradient(to right, transparent, #000 32px, #000 calc(100% - 32px), transparent); }
+.rk-ruler-y canvas { mask-image: linear-gradient(to bottom, transparent, #000 32px, #000 calc(100% - 32px), transparent); }
+.rk-hatch { position: fixed; z-index: 2147483644; top: ${RULER_SIZE}px; bottom: 0; pointer-events: none; background: repeating-linear-gradient(135deg, var(--rk-hatch) 0 1px, transparent 1px 7px); }
 .rk-ruler-band { position: absolute; pointer-events: none; }
 .rk-ruler-mark { position: absolute; padding: 1px 3px; border-radius: 3px; color: white; font-size: 9px; line-height: 12px; white-space: nowrap; pointer-events: none; }
 

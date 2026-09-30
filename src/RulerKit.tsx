@@ -48,6 +48,10 @@ export interface RulerKitProps {
   tools?: Partial<RulerKitTools>
   /** Called whenever a tool is switched on or off, from the toolbar, a shortcut or your UI */
   onToolsChange?: (tools: RulerKitTools) => void
+  /** Number the rulers in page coordinates, which follow scrolling, instead of viewport ones. Defaults to false. */
+  pageCoordinates?: boolean
+  /** Selector for the page's content container. With rulers on, the margins outside it are hatched. */
+  hatch?: string
   /** Render in production builds too. Defaults to false. */
   productionEnabled?: boolean
 }
@@ -69,7 +73,7 @@ type Tools = RulerKitTools
 const DEFAULT_TOOLS: Tools = { measure: true, rulers: false, grids: false, lint: false }
 
 type KitProps = Required<Pick<RulerKitProps, 'color' | 'guideColor' | 'grids' | 'ignore' | 'toolbar' | 'lint'>> &
-  Pick<RulerKitProps, 'defaultTools' | 'tools' | 'onToolsChange'>
+  Pick<RulerKitProps, 'defaultTools' | 'tools' | 'onToolsChange' | 'pageCoordinates' | 'hatch'>
 
 function Kit({
   color,
@@ -81,6 +85,8 @@ function Kit({
   defaultTools,
   tools: toolsProp,
   onToolsChange,
+  pageCoordinates,
+  hatch,
 }: KitProps) {
   // Controlled when `tools` is passed; otherwise saved in the browser, starting from defaultTools
   const [storedTools, setStoredTools] = usePersistentState<Partial<Tools>>('tools', { ...DEFAULT_TOOLS, ...defaultTools })
@@ -139,6 +145,8 @@ function Kit({
           onGuidesChange={setGuides}
           color={color}
           guideColor={guideColor}
+          pageCoordinates={pageCoordinates ?? false}
+          hatch={hatch}
         />
       )}
       {tools.measure && (
@@ -185,6 +193,8 @@ export function RulerKit({
   defaultTools,
   tools,
   onToolsChange,
+  pageCoordinates,
+  hatch,
   productionEnabled = false,
 }: RulerKitProps) {
   // Client only: renders nothing on the server or before hydration
@@ -204,6 +214,8 @@ export function RulerKit({
       defaultTools={defaultTools}
       tools={tools}
       onToolsChange={onToolsChange}
+      pageCoordinates={pageCoordinates}
+      hatch={hatch}
     />
   )
 }

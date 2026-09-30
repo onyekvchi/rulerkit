@@ -111,6 +111,8 @@ It measures element boxes as the browser lays them out, so each flag points at a
 | `defaultTools` | `Partial<RulerKitTools>` | — | Tools on for a first-time visitor, e.g. `{ rulers: true }`; their own toggles are remembered after that |
 | `tools` | `Partial<RulerKitTools>` | — | Control which tools are on from your own UI |
 | `onToolsChange` | `(tools) => void` | — | Called when a tool is switched on or off, from the toolbar, a shortcut or your UI |
+| `pageCoordinates` | `boolean` | `false` | Number the rulers in page coordinates, which follow scrolling, instead of viewport ones |
+| `hatch` | `string` | — | Selector for your content container; with rulers on, the margins outside it are hatched |
 | `productionEnabled` | `boolean` | `false` | Render in production builds too |
 
 ## Driving it from your own UI

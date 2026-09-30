@@ -4,13 +4,13 @@ import type { Guide } from '../measure/geometry'
 import { round } from '../measure/geometry'
 import { RULER_SIZE } from '../styles'
 
-const TICK = 'rgb(255 255 255 / 0.28)'
-const TEXT = 'rgb(255 255 255 / 0.55)'
-
 type Axis = 'x' | 'y'
 
-/** Tick marks every 10px, taller every 50px, numbered every 100px */
-function RulerCanvas({ axis, length }: { axis: Axis; length: number }) {
+/**
+ * Tick marks every 10px, taller every 50px, numbered every 100px. `offset` is
+ * how far the page is scrolled when numbering page coordinates, else 0.
+ */
+function RulerCanvas({ axis, length, offset: scrolled }: { axis: Axis; length: number; offset: number }) {
   const ref = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -27,36 +27,40 @@ function RulerCanvas({ axis, length }: { axis: Axis; length: number }) {
     context.scale(dpr, dpr)
     context.font = '9px ui-sans-serif, system-ui, sans-serif'
     context.textBaseline = 'middle'
+    const style = getComputedStyle(canvas)
+    const tick = style.getPropertyValue('--rk-tick').trim() || 'rgb(255 255 255 / 0.2)'
+    const text = style.getPropertyValue('--rk-tick-text').trim() || 'rgb(255 255 255 / 0.42)'
 
-    // The ruler starts after the corner square, but numbers are viewport coordinates
-    for (let p = Math.ceil(RULER_SIZE / 10) * 10; p <= length + RULER_SIZE; p += 10) {
+    // The ruler starts after the corner square; `value` is the coordinate being numbered
+    for (let value = Math.ceil((RULER_SIZE + scrolled) / 10) * 10; value - scrolled <= length + RULER_SIZE; value += 10) {
+      const p = value - scrolled
       const offset = p - RULER_SIZE
-      const size = p % 100 === 0 ? RULER_SIZE : p % 50 === 0 ? 7 : 4
-      context.fillStyle = TICK
+      const size = value % 100 === 0 ? RULER_SIZE : value % 50 === 0 ? 7 : 4
+      context.fillStyle = tick
       if (axis === 'x') context.fillRect(offset, RULER_SIZE - size, 1, size)
       else context.fillRect(RULER_SIZE - size, offset, size, 1)
 
-      if (p % 100 === 0) {
-        context.fillStyle = TEXT
+      if (value % 100 === 0) {
+        context.fillStyle = text
         if (axis === 'x') {
-          context.fillText(String(p), offset + 3, 7)
+          context.fillText(String(value), offset + 3, 7)
         } else {
           context.save()
           context.translate(7, offset + 3)
           context.rotate(-Math.PI / 2)
           context.textAlign = 'right'
-          context.fillText(String(p), 0, 0)
+          context.fillText(String(value), 0, 0)
           context.restore()
         }
       }
     }
-  }, [axis, length])
+  }, [axis, length, scrolled])
 
   return <canvas ref={ref} />
 }
 
 /** Highlights where the focused elements start and end on each ruler */
-function Marks({ axis, rects, color }: { axis: Axis; rects: DOMRect[]; color: string }) {
+function Marks({ axis, rects, color, offset }: { axis: Axis; rects: DOMRect[]; color: string; offset: number }) {
   return rects.map((rect, index) => {
     const [start, end] = axis === 'x' ? [rect.left, rect.right] : [rect.top, rect.bottom]
     const band =
@@ -78,7 +82,7 @@ function Marks({ axis, rects, color }: { axis: Axis; rects: DOMRect[]; color: st
               }),
         }}
       >
-        {round(value)}
+        {round(value + offset)}
       </span>
     )
 
@@ -99,6 +103,10 @@ export interface RulersProps {
   onGuidesChange: (update: (guides: Guide[]) => Guide[]) => void
   color: string
   guideColor: string
+  /** Number the rulers in page coordinates, which follow scrolling */
+  pageCoordinates: boolean
+  /** Selector for the page's content container; the margins outside it are hatched */
+  hatch?: string
 }
 
 const newId = () => Math.random().toString(36).slice(2, 10)
@@ -107,8 +115,11 @@ const newId = () => Math.random().toString(36).slice(2, 10)
  * Rulers along the top and left of the viewport. Drag from a ruler to add a
  * guide; drag a guide back onto its ruler to remove it.
  */
-export function Rulers({ focus, guides, onGuidesChange, color, guideColor }: RulersProps) {
+export function Rulers({ focus, guides, onGuidesChange, color, guideColor, pageCoordinates, hatch }: RulersProps) {
   useLayoutChange()
+  const scrollX = pageCoordinates ? Math.round(window.scrollX) : 0
+  const scrollY = pageCoordinates ? Math.round(window.scrollY) : 0
+  const container = hatch ? document.querySelector(hatch)?.getBoundingClientRect() : undefined
   const [dragging, setDragging] = useState<Guide | null>(null)
 
   const startDrag = (event: ReactPointerEvent, axis: Axis, id = newId()) => {
@@ -138,6 +149,12 @@ export function Rulers({ focus, guides, onGuidesChange, color, guideColor }: Rul
 
   return (
     <>
+      {container && (
+        <>
+          <div className="rk-hatch" style={{ left: RULER_SIZE, width: Math.max(0, container.left - RULER_SIZE) }} />
+          <div className="rk-hatch" style={{ left: container.right, right: 0 }} />
+        </>
+      )}
       {shown.map((guide) => (
         <div
           key={guide.id}
@@ -149,17 +166,17 @@ export function Rulers({ focus, guides, onGuidesChange, color, guideColor }: Rul
           }}
           onPointerDown={(event) => startDrag(event, guide.axis, guide.id)}
         >
-          <span className="rk-guide-label">{guide.position}</span>
+          <span className="rk-guide-label">{guide.position + (guide.axis === 'x' ? scrollX : scrollY)}</span>
         </div>
       ))}
       {/* Top ruler makes horizontal guides (y), left ruler vertical ones (x) */}
       <div className="rk-ruler rk-ruler-x" onPointerDown={(event) => startDrag(event, 'y')}>
-        <RulerCanvas axis="x" length={window.innerWidth - RULER_SIZE} />
-        <Marks axis="x" rects={rects} color={color} />
+        <RulerCanvas axis="x" length={window.innerWidth - RULER_SIZE} offset={scrollX} />
+        <Marks axis="x" rects={rects} color={color} offset={scrollX} />
       </div>
       <div className="rk-ruler rk-ruler-y" onPointerDown={(event) => startDrag(event, 'x')}>
-        <RulerCanvas axis="y" length={window.innerHeight - RULER_SIZE} />
-        <Marks axis="y" rects={rects} color={color} />
+        <RulerCanvas axis="y" length={window.innerHeight - RULER_SIZE} offset={scrollY} />
+        <Marks axis="y" rects={rects} color={color} offset={scrollY} />
       </div>
       <div className="rk-ruler-corner" />
     </>
