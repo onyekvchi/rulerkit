@@ -105,8 +105,6 @@ export interface RulersProps {
   guideColor: string
   /** Number the rulers in page coordinates, which follow scrolling */
   pageCoordinates: boolean
-  /** Selector for the page's content container; the margins outside it are hatched */
-  hatch?: string
 }
 
 const newId = () => Math.random().toString(36).slice(2, 10)
@@ -115,11 +113,10 @@ const newId = () => Math.random().toString(36).slice(2, 10)
  * Rulers along the top and left of the viewport. Drag from a ruler to add a
  * guide; drag a guide back onto its ruler to remove it.
  */
-export function Rulers({ focus, guides, onGuidesChange, color, guideColor, pageCoordinates, hatch }: RulersProps) {
+export function Rulers({ focus, guides, onGuidesChange, color, guideColor, pageCoordinates }: RulersProps) {
   useLayoutChange()
   const scrollX = pageCoordinates ? Math.round(window.scrollX) : 0
   const scrollY = pageCoordinates ? Math.round(window.scrollY) : 0
-  const container = hatch ? document.querySelector(hatch)?.getBoundingClientRect() : undefined
   const [dragging, setDragging] = useState<Guide | null>(null)
 
   const startDrag = (event: ReactPointerEvent, axis: Axis, id = newId()) => {
@@ -149,12 +146,6 @@ export function Rulers({ focus, guides, onGuidesChange, color, guideColor, pageC
 
   return (
     <>
-      {container && (
-        <>
-          <div className="rk-hatch" style={{ left: RULER_SIZE, width: Math.max(0, container.left - RULER_SIZE) }} />
-          <div className="rk-hatch" style={{ left: container.right, right: 0 }} />
-        </>
-      )}
       {shown.map((guide) => (
         <div
           key={guide.id}
