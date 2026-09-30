@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { type GridConfig, Grids } from './grids/Grids'
 import { forget, isTyping, usePathname, usePersistentState } from './lib/state'
 import type { LintOptions } from './lint/analyze'
@@ -39,6 +39,15 @@ export interface RulerKitProps {
   lint?: LintOptions
   /** Show the floating toolbar. Shortcuts work either way. Defaults to true. */
   toolbar?: boolean
+  /**
+   * Which tools are on for a first-time visitor, e.g. `{ rulers: true }`.
+   * After that, the visitor's own toggles are remembered.
+   */
+  defaultTools?: Partial<RulerKitTools>
+  /** Control which tools are on from your own UI. Pair with `onToolsChange`. */
+  tools?: Partial<RulerKitTools>
+  /** Called whenever a tool is switched on or off, from the toolbar, a shortcut or your UI */
+  onToolsChange?: (tools: RulerKitTools) => void
   /** Render in production builds too. Defaults to false. */
   productionEnabled?: boolean
 }
@@ -48,13 +57,19 @@ declare const process: { env?: { NODE_ENV?: string } }
 
 const isProduction = () => typeof process !== 'undefined' && process.env?.NODE_ENV === 'production'
 
-interface Tools {
+export interface RulerKitTools {
   /** Whether holding Option measures */
   measure: boolean
   rulers: boolean
   grids: boolean
-  lint?: boolean
+  lint: boolean
 }
+type Tools = RulerKitTools
+
+const DEFAULT_TOOLS: Tools = { measure: true, rulers: false, grids: false, lint: false }
+
+type KitProps = Required<Pick<RulerKitProps, 'color' | 'guideColor' | 'grids' | 'ignore' | 'toolbar' | 'lint'>> &
+  Pick<RulerKitProps, 'defaultTools' | 'tools' | 'onToolsChange'>
 
 function Kit({
   color,
@@ -63,8 +78,14 @@ function Kit({
   ignore,
   toolbar,
   lint,
-}: Required<Omit<RulerKitProps, 'productionEnabled'>>) {
-  const [tools, setTools] = usePersistentState<Tools>('tools', { measure: true, rulers: false, grids: false })
+  defaultTools,
+  tools: toolsProp,
+  onToolsChange,
+}: KitProps) {
+  // Controlled when `tools` is passed; otherwise saved in the browser, starting from defaultTools
+  const [storedTools, setStoredTools] = usePersistentState<Partial<Tools>>('tools', { ...DEFAULT_TOOLS, ...defaultTools })
+  const controlled = toolsProp !== undefined
+  const tools: Tools = { ...DEFAULT_TOOLS, ...(controlled ? toolsProp : storedTools) }
   const [gridConfig, setGridConfig] = usePersistentState<GridConfig[] | null>('grids', null)
   const pathname = usePathname()
   const [guides, setGuides] = usePersistentState<Guide[]>(`guides:${pathname}`, NO_GUIDES)
@@ -72,9 +93,17 @@ function Kit({
   const onFocusChange = useCallback((elements: Element[]) => setFocus(elements), [])
   const [lintIssues, setLintIssues] = useState(0)
 
+  // Latest tools and callback for toggle, which keyboard handlers hold on to
+  const latest = useRef({ tools, controlled, onToolsChange })
+  latest.current = { tools, controlled, onToolsChange }
   const toggle = useCallback(
-    (tool: keyof Tools) => setTools((current) => ({ ...current, [tool]: !current[tool] })),
-    [setTools],
+    (tool: keyof Tools) => {
+      const { tools: current, controlled: isControlled, onToolsChange: notify } = latest.current
+      const next = { ...current, [tool]: !current[tool] }
+      if (!isControlled) setStoredTools(next)
+      notify?.(next)
+    },
+    [setStoredTools],
   )
 
   useEffect(() => {
@@ -125,7 +154,7 @@ function Kit({
           measure={tools.measure}
           rulers={tools.rulers}
           grids={tools.grids}
-          lint={Boolean(tools.lint)}
+          lint={tools.lint}
           lintIssues={lintIssues}
           onToggle={toggle}
           gridConfig={activeGrids}
@@ -153,6 +182,9 @@ export function RulerKit({
   ignore = '',
   toolbar = true,
   lint = DEFAULT_LINT,
+  defaultTools,
+  tools,
+  onToolsChange,
   productionEnabled = false,
 }: RulerKitProps) {
   // Client only: renders nothing on the server or before hydration
@@ -161,5 +193,17 @@ export function RulerKit({
 
   if (!mounted || (isProduction() && !productionEnabled)) return null
 
-  return <Kit color={color} guideColor={guideColor} grids={grids} ignore={ignore} toolbar={toolbar} lint={lint} />
+  return (
+    <Kit
+      color={color}
+      guideColor={guideColor}
+      grids={grids}
+      ignore={ignore}
+      toolbar={toolbar}
+      lint={lint}
+      defaultTools={defaultTools}
+      tools={tools}
+      onToolsChange={onToolsChange}
+    />
+  )
 }

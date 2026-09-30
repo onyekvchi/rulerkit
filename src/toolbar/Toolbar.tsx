@@ -545,6 +545,8 @@ export function Toolbar({
         <button
           type="button"
           className="rk-fab"
+          // Stable hook for pages that point at the button (e.g. an onboarding hint)
+          data-rulerkit-button=""
           aria-expanded={expanded}
           aria-label={expanded ? 'Close rulerkit' : 'Open rulerkit'}
           title={expanded ? 'Close' : 'rulerkit · drag to move'}

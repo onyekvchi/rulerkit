@@ -108,7 +108,23 @@ It measures element boxes as the browser lays them out, so each flag points at a
 | `lint` | `{ base?: number; allow?: number[] }` | `{ base: 8, allow: [4] }` | Spacing scale for the lint |
 | `ignore` | `string` | — | Extra CSS selector for elements that can't be measured |
 | `toolbar` | `boolean` | `true` | Show the floating toolbar |
+| `defaultTools` | `Partial<RulerKitTools>` | — | Tools on for a first-time visitor, e.g. `{ rulers: true }`; their own toggles are remembered after that |
+| `tools` | `Partial<RulerKitTools>` | — | Control which tools are on from your own UI |
+| `onToolsChange` | `(tools) => void` | — | Called when a tool is switched on or off, from the toolbar, a shortcut or your UI |
 | `productionEnabled` | `boolean` | `false` | Render in production builds too |
+
+## Driving it from your own UI
+
+`tools` and `onToolsChange` let a page switch tools on and off and show their state, for example a docs page with its own buttons:
+
+```jsx
+const [tools, setTools] = useState({ measure: true, rulers: true, grids: false, lint: false })
+
+<button onClick={() => setTools({ ...tools, grids: !tools.grids })}>Grids</button>
+<RulerKit tools={tools} onToolsChange={setTools} />
+```
+
+The round button carries a `data-rulerkit-button` attribute, so you can point at it (say, with an onboarding hint).
 
 ## Shortcuts
 
