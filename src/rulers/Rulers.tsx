@@ -1,5 +1,5 @@
 import { type PointerEvent as ReactPointerEvent, useEffect, useRef, useState } from 'react'
-import { useLayoutChange } from '../lib/state'
+import { isTyping, useLayoutChange } from '../lib/state'
 import type { Guide } from '../measure/geometry'
 import { round } from '../measure/geometry'
 import { RULER_SIZE } from '../styles'
@@ -118,6 +118,24 @@ export function Rulers({ focus, guides, onGuidesChange, color, guideColor, pageC
   const scrollX = pageCoordinates ? Math.round(window.scrollX) : 0
   const scrollY = pageCoordinates ? Math.round(window.scrollY) : 0
   const [dragging, setDragging] = useState<Guide | null>(null)
+  const [hovered, setHovered] = useState<string | null>(null)
+
+  const remove = (id: string) => onGuidesChange((current) => current.filter((guide) => guide.id !== id))
+
+  // Delete or Backspace removes the guide under the pointer
+  useEffect(() => {
+    if (!hovered) return
+    const onKeyDown = (event: KeyboardEvent) => {
+      if ((event.key === 'Delete' || event.key === 'Backspace') && !isTyping(event.target)) {
+        event.preventDefault()
+        remove(hovered)
+        setHovered(null)
+      }
+    }
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hovered])
 
   const startDrag = (event: ReactPointerEvent, axis: Axis, id = newId()) => {
     if (event.button !== 0) return
@@ -156,6 +174,9 @@ export function Rulers({ focus, guides, onGuidesChange, color, guideColor, pageC
             ...(guide.axis === 'x' ? { left: guide.position } : { top: guide.position }),
           }}
           onPointerDown={(event) => startDrag(event, guide.axis, guide.id)}
+          onPointerEnter={() => setHovered(guide.id)}
+          onPointerLeave={() => setHovered((current) => (current === guide.id ? null : current))}
+          onDoubleClick={() => remove(guide.id)}
         >
           <span className="rk-guide-label">{guide.position + (guide.axis === 'x' ? scrollX : scrollY)}</span>
         </div>

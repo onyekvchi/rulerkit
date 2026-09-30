@@ -56,7 +56,8 @@ Values are rounded to one decimal place, so sub-pixel layout shows up (e.g. `15.
 
 - The element you're hovering or have selected is marked on both rulers, with its start and end positions.
 - **Drag from a ruler** to add a guide: the top ruler makes horizontal guides, the left ruler vertical ones.
-- **Drag a guide** to move it; drop it back on its ruler to remove it. Hover a guide to see its position.
+- **Drag a guide** to move it. Hover a guide to see its position.
+- **Remove a guide** by double-clicking it, pressing Delete or Backspace while hovering it, or dragging it back onto its ruler.
 - With an element selected, **Option-hover a guide** to measure the distance to it.
 
 Guides are saved per page (by pathname) and stay fixed to the viewport, so they're for checking alignment rather than marking a spot in a long scrolling page.
