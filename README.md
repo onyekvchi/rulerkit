@@ -87,7 +87,7 @@ The **grid settings** button in the toolbar opens a panel to edit grids live, in
 
 **Shift + L** (or the lint button in the toolbar) shows how the page is spaced. Every item gets a thin outline, and the gaps between neighbouring items and each container's padding are filled in with their values.
 
-Spacing on your scale is shaded blue. Anything off it gets a striped red band and a suggested value, like `14 → 16`, so mismatches stand out before you read a number. The toolbar button (and the closed round button) shows how many there are.
+Spacing on your scale is shaded blue, without numbers. Anything off it gets a striped red band with its value and a suggestion, like `14 → 16`, so only the problems have text to read. The toolbar button (and the closed round button) shows how many there are.
 
 By default spacing should be a multiple of 8, with 4 also allowed. Set your own scale with the `lint` prop:
 

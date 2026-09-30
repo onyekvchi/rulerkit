@@ -61,10 +61,13 @@ export function Lint({
           data-axis={spacing.axis}
           style={spacing.band}
         >
-          <span className="rk-lint-label">
-            {spacing.value}
-            {!spacing.ok && spacing.suggestion !== undefined && <span> → {spacing.suggestion}</span>}
-          </span>
+          {/* Only broken spacing gets a number; on-scale bands are just shaded */}
+          {!spacing.ok && (
+            <span className="rk-lint-label">
+              {spacing.value}
+              {spacing.suggestion !== undefined && <span> → {spacing.suggestion}</span>}
+            </span>
+          )}
         </span>
       ))}
     </div>
