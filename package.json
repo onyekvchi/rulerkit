@@ -1,6 +1,6 @@
 {
   "name": "inspectkit",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Figma-style layout inspection for your running app: measure distances, rulers with guides, layout grids and a spacing lint.",
   "keywords": [
     "react",
