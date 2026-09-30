@@ -57,10 +57,9 @@ export const css = `
 .rk-lint { position: fixed; inset: 0; z-index: 2147483642; pointer-events: none; }
 /* Lint: green for on-scale spacing, red for off-scale */
 .rk-lint-box { position: fixed; outline: 1px dashed rgb(48 164 108 / 0.4); outline-offset: -0.5px; }
-.rk-lint-band { position: fixed; display: grid; place-items: center; background-color: rgb(48 164 108 / 0.16); outline: 1px solid transparent; outline-offset: -0.5px; transition: background-color 200ms ease-out, outline-color 200ms ease-out; }
-.rk-lint-band[data-off] { background-color: rgb(229 72 77 / 0.06); background-image: repeating-linear-gradient(45deg, rgb(229 72 77 / 0.16) 0 1px, transparent 1px 6px); outline-color: rgb(229 72 77 / 0.4); z-index: 1; }
-.rk-lint-label { padding: 1px 4px; border-radius: 3px; background: rgb(48 164 108 / 0.9); color: white; font-size: 9.5px; line-height: 13px; font-weight: 600; white-space: nowrap; transition: opacity 150ms ease-out; }
-@starting-style { .rk-lint-label { opacity: 0; } }
+.rk-lint-band { position: fixed; display: grid; place-items: center; background: rgb(48 164 108 / 0.16); }
+.rk-lint-band[data-off] { background: repeating-linear-gradient(45deg, rgb(229 72 77 / 0.22) 0 1px, rgb(229 72 77 / 0.06) 1px 6px); outline: 1px solid rgb(229 72 77 / 0.4); outline-offset: -0.5px; z-index: 1; }
+.rk-lint-label { padding: 1px 4px; border-radius: 3px; background: rgb(48 164 108 / 0.9); color: white; font-size: 9.5px; line-height: 13px; font-weight: 600; white-space: nowrap; }
 .rk-lint-band[data-off] .rk-lint-label { background: #e5484d; font-size: 10.5px; box-shadow: 0 1px 3px rgb(0 0 0 / 0.3); }
 .rk-lint-label span { opacity: 0.85; font-weight: 500; }
 .rk-fab-dot { position: absolute; top: 6px; right: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--rk-accent); box-shadow: 0 0 0 2px rgb(22 22 24); }

@@ -5,11 +5,6 @@ import { analyze, type LintOptions, type LintResult } from './analyze'
 // (animations, content loading, edits in DialKit) show up
 const RESCAN_MS = 500
 
-// While something transitions or animates, re-scan every frame so the overlay
-// follows it instead of lagging behind and jumping. Capped per trigger so an
-// endless animation (a spinner) can't keep the lint scanning forever.
-const FOLLOW_MS = 700
-
 const EMPTY: LintResult = { boxes: [], spacings: [], issues: 0 }
 
 /**
@@ -40,34 +35,15 @@ export function Lint({
         onIssues(next.issues)
       })
     }
-    // Runs a scan every frame until FOLLOW_MS after the last transition or animation began
-    let followUntil = 0
-    let following = false
-    const follow = () => {
-      followUntil = performance.now() + FOLLOW_MS
-      if (following) return
-      following = true
-      const tick = () => {
-        scan()
-        if (performance.now() < followUntil) requestAnimationFrame(tick)
-        else following = false
-      }
-      requestAnimationFrame(tick)
-    }
     scan()
     const id = setInterval(scan, RESCAN_MS)
     window.addEventListener('scroll', scan, true)
     window.addEventListener('resize', scan)
-    window.addEventListener('transitionrun', follow, true)
-    window.addEventListener('animationstart', follow, true)
     return () => {
       cancelAnimationFrame(frame)
-      followUntil = 0
       clearInterval(id)
       window.removeEventListener('scroll', scan, true)
       window.removeEventListener('resize', scan)
-      window.removeEventListener('transitionrun', follow, true)
-      window.removeEventListener('animationstart', follow, true)
       onIssues(0)
     }
   }, [base, allowKey, excluded, onIssues])
