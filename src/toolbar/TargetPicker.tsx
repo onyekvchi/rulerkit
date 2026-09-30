@@ -57,7 +57,7 @@ interface Hovered {
 
 /**
  * Eyedropper for grid targets: highlights the element under the pointer and
- * picks it on click. rulerkit's own UI keeps working (so the panel's button
+ * picks it on click. inspectkit's own UI keeps working (so the panel's button
  * can cancel), and the page doesn't receive the picking click.
  */
 export function TargetPicker({
@@ -72,7 +72,7 @@ export function TargetPicker({
   const [hovered, setHovered] = useState<Hovered | null>(null)
 
   useEffect(() => {
-    const excluded = `[data-rulerkit], ${ignore}`
+    const excluded = `[data-inspectkit], ${ignore}`
     const pickable = (target: EventTarget | null) =>
       target instanceof Element && target !== document.documentElement && target !== document.body && !target.closest(excluded)
         ? target
@@ -121,13 +121,13 @@ export function TargetPicker({
   const { rect, selector } = hovered
 
   return (
-    <div className="rk-picker" aria-hidden="true">
+    <div className="ik-picker" aria-hidden="true">
       <div
-        className="rk-picker-box"
+        className="ik-picker-box"
         style={{ left: rect.left, top: rect.top, width: rect.width, height: rect.height }}
       />
       <div
-        className="rk-picker-label"
+        className="ik-picker-label"
         style={{ left: rect.left, top: rect.top > 28 ? rect.top - 24 : rect.bottom + 4 }}
       >
         {selector}

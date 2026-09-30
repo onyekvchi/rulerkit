@@ -28,8 +28,8 @@ function RulerCanvas({ axis, length, offset: scrolled }: { axis: Axis; length: n
     context.font = '9px ui-sans-serif, system-ui, sans-serif'
     context.textBaseline = 'middle'
     const style = getComputedStyle(canvas)
-    const tick = style.getPropertyValue('--rk-tick').trim() || 'rgb(255 255 255 / 0.2)'
-    const text = style.getPropertyValue('--rk-tick-text').trim() || 'rgb(255 255 255 / 0.42)'
+    const tick = style.getPropertyValue('--ik-tick').trim() || 'rgb(255 255 255 / 0.2)'
+    const text = style.getPropertyValue('--ik-tick-text').trim() || 'rgb(255 255 255 / 0.42)'
 
     // The ruler starts after the corner square; `value` is the coordinate being numbered
     for (let value = Math.ceil((RULER_SIZE + scrolled) / 10) * 10; value - scrolled <= length + RULER_SIZE; value += 10) {
@@ -69,7 +69,7 @@ function Marks({ axis, rects, color, offset }: { axis: Axis; rects: DOMRect[]; c
         : { top: start - RULER_SIZE, height: end - start, left: 0, right: 0 }
     const mark = (value: number, side: 'start' | 'end') => (
       <span
-        className="rk-ruler-mark"
+        className="ik-ruler-mark"
         style={{
           background: color,
           ...(axis === 'x'
@@ -88,7 +88,7 @@ function Marks({ axis, rects, color, offset }: { axis: Axis; rects: DOMRect[]; c
 
     return (
       <span key={index}>
-        <span className="rk-ruler-band" style={{ ...band, background: `color-mix(in srgb, ${color} 20%, transparent)` }} />
+        <span className="ik-ruler-band" style={{ ...band, background: `color-mix(in srgb, ${color} 20%, transparent)` }} />
         {mark(start, 'start')}
         {mark(end, 'end')}
       </span>
@@ -167,10 +167,10 @@ export function Rulers({ focus, guides, onGuidesChange, color, guideColor, pageC
       {shown.map((guide) => (
         <div
           key={guide.id}
-          className={`rk-guide rk-guide-${guide.axis}`}
+          className={`ik-guide ik-guide-${guide.axis}`}
           data-dragging={guide.id === dragging?.id ? '' : undefined}
           style={{
-            ['--rk-guide' as string]: guideColor,
+            ['--ik-guide' as string]: guideColor,
             ...(guide.axis === 'x' ? { left: guide.position } : { top: guide.position }),
           }}
           onPointerDown={(event) => startDrag(event, guide.axis, guide.id)}
@@ -178,19 +178,19 @@ export function Rulers({ focus, guides, onGuidesChange, color, guideColor, pageC
           onPointerLeave={() => setHovered((current) => (current === guide.id ? null : current))}
           onDoubleClick={() => remove(guide.id)}
         >
-          <span className="rk-guide-label">{guide.position + (guide.axis === 'x' ? scrollX : scrollY)}</span>
+          <span className="ik-guide-label">{guide.position + (guide.axis === 'x' ? scrollX : scrollY)}</span>
         </div>
       ))}
       {/* Top ruler makes horizontal guides (y), left ruler vertical ones (x) */}
-      <div className="rk-ruler rk-ruler-x" onPointerDown={(event) => startDrag(event, 'y')}>
+      <div className="ik-ruler ik-ruler-x" onPointerDown={(event) => startDrag(event, 'y')}>
         <RulerCanvas axis="x" length={window.innerWidth - RULER_SIZE} offset={scrollX} />
         <Marks axis="x" rects={rects} color={color} offset={scrollX} />
       </div>
-      <div className="rk-ruler rk-ruler-y" onPointerDown={(event) => startDrag(event, 'x')}>
+      <div className="ik-ruler ik-ruler-y" onPointerDown={(event) => startDrag(event, 'x')}>
         <RulerCanvas axis="y" length={window.innerHeight - RULER_SIZE} offset={scrollY} />
         <Marks axis="y" rects={rects} color={color} offset={scrollY} />
       </div>
-      <div className="rk-ruler-corner" />
+      <div className="ik-ruler-corner" />
     </>
   )
 }

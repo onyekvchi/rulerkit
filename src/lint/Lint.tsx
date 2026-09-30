@@ -49,21 +49,21 @@ export function Lint({
   }, [base, allowKey, excluded, onIssues])
 
   return (
-    <div className="rk-lint" aria-hidden="true">
+    <div className="ik-lint" aria-hidden="true">
       {result.boxes.map((box, index) => (
-        <span key={`b${index}`} className="rk-lint-box" style={box} />
+        <span key={`b${index}`} className="ik-lint-box" style={box} />
       ))}
       {result.spacings.map((spacing, index) => (
         <span
           key={`s${index}`}
-          className="rk-lint-band"
+          className="ik-lint-band"
           data-off={spacing.ok ? undefined : ''}
           data-axis={spacing.axis}
           style={spacing.band}
         >
           {/* Only broken spacing gets a number; on-scale bands are just shaded */}
           {!spacing.ok && (
-            <span className="rk-lint-label">
+            <span className="ik-lint-label">
               {spacing.value}
               {spacing.suggestion !== undefined && <span> → {spacing.suggestion}</span>}
             </span>

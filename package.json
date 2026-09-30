@@ -1,7 +1,7 @@
 {
-  "name": "rulerkit",
+  "name": "inspectkit",
   "version": "0.3.0",
-  "description": "Figma-style layout inspection for your running app: measure distances, rulers with guides, and layout grids.",
+  "description": "Figma-style layout inspection for your running app: measure distances, rulers with guides, layout grids and a spacing lint.",
   "keywords": [
     "react",
     "design",
@@ -9,19 +9,21 @@
     "redlines",
     "spacing",
     "rulers",
+    "inspect",
+    "lint",
     "layout-grid",
     "devtools",
     "design-engineering"
   ],
   "license": "MIT",
   "author": "Onyekachi Mbaike",
-  "homepage": "https://github.com/onyekvchi/rulerkit#readme",
+  "homepage": "https://github.com/onyekvchi/inspectkit#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/onyekvchi/rulerkit.git"
+    "url": "git+https://github.com/onyekvchi/inspectkit.git"
   },
   "bugs": {
-    "url": "https://github.com/onyekvchi/rulerkit/issues"
+    "url": "https://github.com/onyekvchi/inspectkit/issues"
   },
   "type": "module",
   "main": "./dist/index.cjs",

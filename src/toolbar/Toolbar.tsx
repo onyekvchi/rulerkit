@@ -96,7 +96,7 @@ function ToggleButton({
   children: ReactNode
 }) {
   return (
-    <button type="button" className="rk-button" aria-label={label} title={label} aria-pressed={pressed} onClick={onClick}>
+    <button type="button" className="ik-button" aria-label={label} title={label} aria-pressed={pressed} onClick={onClick}>
       {children}
     </button>
   )
@@ -116,7 +116,7 @@ function NumberField({
   max?: number
 }) {
   return (
-    <label className="rk-field">
+    <label className="ik-field">
       {label}
       <input
         type="number"
@@ -154,10 +154,10 @@ function ColorField({ color, onChange }: { color: string; onChange: (color: stri
   const { hex, alpha } = parseColor(color)
 
   return (
-    <div className="rk-color-row">
-      <label className="rk-field">
+    <div className="ik-color-row">
+      <label className="ik-field">
         Color
-        <span className="rk-color">
+        <span className="ik-color">
           <input
             type="color"
             aria-label="Grid color"
@@ -203,8 +203,8 @@ function GridCard({
     )
 
   return (
-    <div className="rk-grid-card" data-hidden={grid.hidden ? '' : undefined}>
-      <div className="rk-grid-card-header">
+    <div className="ik-grid-card" data-hidden={grid.hidden ? '' : undefined}>
+      <div className="ik-grid-card-header">
         <select
           aria-label="Grid type"
           value={grid.type}
@@ -216,7 +216,7 @@ function GridCard({
         </select>
         <button
           type="button"
-          className="rk-icon-button"
+          className="ik-icon-button"
           aria-label={grid.hidden ? 'Show grid' : 'Hide grid'}
           title={grid.hidden ? 'Show grid' : 'Hide grid'}
           aria-pressed={!grid.hidden}
@@ -224,7 +224,7 @@ function GridCard({
         >
           {grid.hidden ? icons.eyeOff : icons.eye}
         </button>
-        <button type="button" className="rk-text-button rk-text-button-quiet" onClick={onRemove}>
+        <button type="button" className="ik-text-button ik-text-button-quiet" onClick={onRemove}>
           Remove
         </button>
       </div>
@@ -238,7 +238,7 @@ function GridCard({
         <>
           <NumberField label="Count" value={grid.count} min={1} onChange={(count) => set({ count })} />
           <NumberField label="Gutter" value={grid.gutter} onChange={(gutter) => set({ gutter })} />
-          <label className="rk-field">
+          <label className="ik-field">
             Alignment
             <select
               value={grid.alignment ?? 'stretch'}
@@ -264,9 +264,9 @@ function GridCard({
         onChange={(color) => set({ color })}
       />
 
-      <div className="rk-field" style={{ gridColumn: '1 / -1' }}>
+      <div className="ik-field" style={{ gridColumn: '1 / -1' }}>
         <label htmlFor={targetId}>Target (CSS selector, empty for viewport)</label>
-        <div className="rk-target-row">
+        <div className="ik-target-row">
           <input
             id={targetId}
             type="text"
@@ -276,7 +276,7 @@ function GridCard({
           />
           <button
             type="button"
-            className="rk-icon-button rk-icon-button-field"
+            className="ik-icon-button ik-icon-button-field"
             aria-label={picking ? 'Cancel picking' : 'Pick target element'}
             title={picking ? 'Cancel (Esc)' : 'Pick an element on the page'}
             aria-pressed={picking}
@@ -285,7 +285,7 @@ function GridCard({
             {icons.eyedropper}
           </button>
         </div>
-        {picking && <span className="rk-hint">Click an element to use it · Esc to cancel</span>}
+        {picking && <span className="ik-hint">Click an element to use it · Esc to cancel</span>}
       </div>
     </div>
   )
@@ -334,7 +334,7 @@ function GridPanel({
     {/* Rendered beside the panel: its backdrop-filter would trap fixed positioning */}
     {picking !== null && <TargetPicker ignore={ignore} onPick={onPick} onCancel={onCancelPick} />}
     <div
-      className="rk-panel"
+      className="ik-panel"
       role="dialog"
       aria-label="Layout grids"
       // Shortcuts pause while a field has focus; Esc or Enter leaves the field
@@ -345,9 +345,9 @@ function GridPanel({
         }
       }}
     >
-      <div className="rk-panel-header">
+      <div className="ik-panel-header">
         Layout grids
-        <button type="button" className="rk-text-button" onClick={() => onChange([...grids, newGrid()])}>
+        <button type="button" className="ik-text-button" onClick={() => onChange([...grids, newGrid()])}>
           Add
         </button>
       </div>
@@ -364,11 +364,11 @@ function GridPanel({
           onTogglePick={() => setPicking((current) => (current === index ? null : index))}
         />
       ))}
-      <div className="rk-panel-footer">
-        <button type="button" className="rk-text-button rk-text-button-quiet" onClick={onReset}>
+      <div className="ik-panel-footer">
+        <button type="button" className="ik-text-button ik-text-button-quiet" onClick={onReset}>
           Reset
         </button>
-        <button type="button" className="rk-text-button" onClick={copy}>
+        <button type="button" className="ik-text-button" onClick={copy}>
           {copied ? 'Copied' : 'Copy props'}
         </button>
       </div>
@@ -512,7 +512,7 @@ export function Toolbar({
     dockStyle.alignItems = alignRight ? 'flex-end' : 'flex-start'
     // The panel can only be as tall as the space on the side it opens towards
     const space = panelBelow ? window.innerHeight - position.y - CIRCLE : position.y
-    ;(dockStyle as Record<string, string | number>)['--rk-panel-max'] = `${Math.max(space - 8 - EDGE, 160)}px`
+    ;(dockStyle as Record<string, string | number>)['--ik-panel-max'] = `${Math.max(space - 8 - EDGE, 160)}px`
   }
 
   const toggleExpanded = () => {
@@ -522,8 +522,8 @@ export function Toolbar({
 
   return (
     <div
-      className="rk-dock"
-      data-rulerkit=""
+      className="ik-dock"
+      data-inspectkit=""
       data-rulers={rulers ? '' : undefined}
       data-moved={position ? '' : undefined}
       data-dragging={drag.dragging ? '' : undefined}
@@ -534,9 +534,9 @@ export function Toolbar({
       )}
       <div
         ref={drag.ref}
-        className="rk-toolbar"
+        className="ik-toolbar"
         role="toolbar"
-        aria-label="rulerkit"
+        aria-label="inspectkit"
         data-expanded={expanded ? '' : undefined}
         data-side={alignRight ? 'right' : 'left'}
         onPointerDown={drag.onPointerDown}
@@ -544,27 +544,27 @@ export function Toolbar({
       >
         <button
           type="button"
-          className="rk-fab"
+          className="ik-fab"
           // Stable hook for pages that point at the button (e.g. an onboarding hint)
-          data-rulerkit-button=""
+          data-inspectkit-button=""
           aria-expanded={expanded}
-          aria-label={expanded ? 'Close rulerkit' : 'Open rulerkit'}
-          title={expanded ? 'Close' : 'rulerkit · drag to move'}
+          aria-label={expanded ? 'Close inspectkit' : 'Open inspectkit'}
+          title={expanded ? 'Close' : 'inspectkit · drag to move'}
           onClick={toggleExpanded}
         >
           {expanded ? icons.close : icons.logo}
           {!expanded && lint && lintIssues > 0 ? (
-            <span className="rk-count rk-fab-count" aria-hidden="true">
+            <span className="ik-count ik-fab-count" aria-hidden="true">
               {lintIssues}
             </span>
           ) : (
-            !expanded && (rulers || grids || lint) && <span className="rk-fab-dot" aria-hidden="true" />
+            !expanded && (rulers || grids || lint) && <span className="ik-fab-dot" aria-hidden="true" />
           )}
         </button>
         {/* Width animates from 0 via grid-template-columns; inert while collapsed */}
-        <div className="rk-tools" inert={!expanded}>
-          <div className="rk-tools-inner">
-            <span className="rk-divider" aria-hidden="true" />
+        <div className="ik-tools" inert={!expanded}>
+          <div className="ik-tools-inner">
+            <span className="ik-divider" aria-hidden="true" />
             <ToggleButton label="Measure (hold Option)" pressed={measure} onClick={() => onToggle('measure')}>
               {icons.measure}
             </ToggleButton>
@@ -585,7 +585,7 @@ export function Toolbar({
             >
               {icons.lint}
               {lint && lintIssues > 0 && (
-                <span className="rk-count" aria-hidden="true">
+                <span className="ik-count" aria-hidden="true">
                   {lintIssues > 99 ? '99+' : lintIssues}
                 </span>
               )}

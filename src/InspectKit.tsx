@@ -23,7 +23,7 @@ const NO_GRIDS: GridConfig[] = []
 const NO_GUIDES: Guide[] = []
 const DEFAULT_LINT: LintOptions = { base: 8, allow: [4] }
 
-export interface RulerKitProps {
+export interface InspectKitProps {
   /** Colour of outlines, measurement lines, labels and ruler marks. Defaults to Figma's redline orange. */
   color?: string
   /** Colour of ruler guides. Defaults to Figma's guide blue. */
@@ -43,11 +43,11 @@ export interface RulerKitProps {
    * Which tools are on for a first-time visitor, e.g. `{ rulers: true }`.
    * After that, the visitor's own toggles are remembered.
    */
-  defaultTools?: Partial<RulerKitTools>
+  defaultTools?: Partial<InspectKitTools>
   /** Control which tools are on from your own UI. Pair with `onToolsChange`. */
-  tools?: Partial<RulerKitTools>
+  tools?: Partial<InspectKitTools>
   /** Called whenever a tool is switched on or off, from the toolbar, a shortcut or your UI */
-  onToolsChange?: (tools: RulerKitTools) => void
+  onToolsChange?: (tools: InspectKitTools) => void
   /** Number the rulers in page coordinates, which follow scrolling, instead of viewport ones. Defaults to false. */
   pageCoordinates?: boolean
   /** Render in production builds too. Defaults to false. */
@@ -59,19 +59,19 @@ declare const process: { env?: { NODE_ENV?: string } }
 
 const isProduction = () => typeof process !== 'undefined' && process.env?.NODE_ENV === 'production'
 
-export interface RulerKitTools {
+export interface InspectKitTools {
   /** Whether holding Option measures */
   measure: boolean
   rulers: boolean
   grids: boolean
   lint: boolean
 }
-type Tools = RulerKitTools
+type Tools = InspectKitTools
 
 const DEFAULT_TOOLS: Tools = { measure: true, rulers: false, grids: false, lint: false }
 
-type KitProps = Required<Pick<RulerKitProps, 'color' | 'guideColor' | 'grids' | 'ignore' | 'toolbar' | 'lint'>> &
-  Pick<RulerKitProps, 'defaultTools' | 'tools' | 'onToolsChange' | 'pageCoordinates'>
+type KitProps = Required<Pick<InspectKitProps, 'color' | 'guideColor' | 'grids' | 'ignore' | 'toolbar' | 'lint'>> &
+  Pick<InspectKitProps, 'defaultTools' | 'tools' | 'onToolsChange' | 'pageCoordinates'>
 
 function Kit({
   color,
@@ -133,10 +133,10 @@ function Kit({
   const ignoreSelector = ignore ? `${DEFAULT_IGNORE}, ${ignore}` : DEFAULT_IGNORE
 
   return (
-    <div data-rulerkit="">
+    <div data-inspectkit="">
       <style>{css}</style>
       {tools.grids && <Grids grids={activeGrids} />}
-      {tools.lint && <Lint options={lint} excluded={`[data-rulerkit], ${ignoreSelector}`} onIssues={setLintIssues} />}
+      {tools.lint && <Lint options={lint} excluded={`[data-inspectkit], ${ignoreSelector}`} onIssues={setLintIssues} />}
       {tools.rulers && (
         <Rulers
           focus={focus}
@@ -181,7 +181,7 @@ function Kit({
  * guides (Shift + R), layout grids (Shift + G) and a spacing lint (Shift + L). Mount it once, anywhere in
  * your tree.
  */
-export function RulerKit({
+export function InspectKit({
   color = '#f24822',
   guideColor = '#0d99ff',
   grids = NO_GRIDS,
@@ -193,7 +193,7 @@ export function RulerKit({
   onToolsChange,
   pageCoordinates,
   productionEnabled = false,
-}: RulerKitProps) {
+}: InspectKitProps) {
   // Client only: renders nothing on the server or before hydration
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
